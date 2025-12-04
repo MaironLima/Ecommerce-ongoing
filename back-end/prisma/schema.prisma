@@ -1,0 +1,161 @@
+datasource db {
+    provider = "postgresql"
+}
+
+generator client {
+    provider = "prisma-client"
+    output   = "../src/generated"
+}
+
+model User {
+    id           String         @id @default(uuid())
+    email        String         @unique
+    password     String
+    name         String         @unique
+    role         Permissions
+    created_at   DateTime       @default(now())
+    updated_at   DateTime       @updatedAt
+    addresses    Address[]
+    cart         Cart[]
+    review       Review[]
+    notification Notification[]
+
+    @@map("user")
+}
+
+enum Permissions {
+    CUSTOMER
+    ADMIN
+    SUPERADMIN
+}
+
+model Address {
+    id      String @id @default(uuid())
+    user_id String
+
+    id_sync User @relation(fields: [user_id], references: [id])
+
+    @@map("address")
+}
+
+model Product {
+    id               String            @id @default(uuid())
+    title            String
+    description      String
+    base_price       Float
+    main_image       String
+    product_variant  ProductVariant[]
+    product_caregory ProductCategory[]
+    extra_imagens    ExtraImagens[]
+    review           Review[]
+
+    @@map("product")
+}
+
+model ProductVariant {
+    id                    String                 @id @default(uuid())
+    product_id            String
+    cart_item             CartItem[]
+    inventory_reservation InventoryReservation[]
+
+    product_sync Product @relation(fields: [product_id], references: [id])
+
+    @@map("product_variant")
+}
+
+model Category {
+    id               String            @id @default(uuid())
+    name             String
+    slug             String            @unique
+    product_category ProductCategory[]
+
+    @@map("category")
+}
+
+model ProductCategory {
+    id          String @id @default(uuid())
+    product_id  String
+    category_id String
+
+    product_sync  Product  @relation(fields: [product_id], references: [id])
+    category_sync Category @relation(fields: [category_id], references: [id])
+
+    @@map("product_category")
+}
+
+model ExtraImagens {
+    id         String   @id @default(uuid())
+    product_id String
+    path       String[]
+    width      Int
+    height     Int
+    optimized  Boolean  @default(false)
+
+    product_sync Product @relation(fields: [product_id], references: [id])
+
+    @@map("extra_imagens")
+}
+
+model Cart {
+    id         String     @id @default(uuid())
+    user_id    String
+    created_at DateTime   @default(now())
+    updated_at DateTime   @updatedAt
+    cart_item  CartItem[]
+
+    id_sync User @relation(fields: [user_id], references: [id])
+
+    @@map("cart")
+}
+
+model CartItem {
+    id                  String @id @default(uuid())
+    cart_id             String
+    variant_id          String
+    quantity            Int    @default(1)
+    unit_price_snapshot Float
+
+    cart_sync    Cart           @relation(fields: [cart_id], references: [id])
+    variant_sync ProductVariant @relation(fields: [variant_id], references: [id])
+
+    @@map("cart_item")
+}
+
+model Review {
+    id         String   @id @default(uuid())
+    product_id String
+    user_id    String
+    rating     Int
+    title      String
+    comment    String?
+    moderated  Boolean  @default(false)
+    created_at DateTime @default(now())
+
+    id_sync      User    @relation(fields: [user_id], references: [id])
+    product_sync Product @relation(fields: [product_id], references: [id])
+
+    @@map("review")
+}
+
+model InventoryReservation {
+    id         String   @id @default(uuid())
+    variant_id String
+    quantity   Int      @default(1)
+    expires_at DateTime @default(dbgenerated("(now() + '00:15:00'::interval)"))
+
+    variant_sync ProductVariant @relation(fields: [variant_id], references: [id])
+
+    @@map("inventory_reservation")
+}
+
+model Notification {
+    id      String  @id @default(uuid())
+    user_id String
+    type    String
+    message String
+    read    Boolean
+
+    id_sync User @relation(fields: [user_id], references: [id])
+
+    @@map("notifications")
+}
