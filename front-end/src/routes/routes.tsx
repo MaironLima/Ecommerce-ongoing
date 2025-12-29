@@ -1,6 +1,10 @@
-import { createBrowserRouter } from "react-router-dom"
-import ErrorPage from "../components/ErrorPage"
-import App from "../App"
+import { createBrowserRouter } from "react-router-dom";
+import ErrorPage from "../components/ErrorPage";
+import App from "../App";
+import LoginPage from "@/components/LoginPage";
+import RegisterPage from "@/components/RegisterPage";
+import RecoverPage from "@/components/RecoverPage";
+import Buttons from "@/components/Buttons";
 
 const router = createBrowserRouter([
   {
@@ -8,14 +12,33 @@ const router = createBrowserRouter([
     element: <App />,
     errorElement: <ErrorPage />,
     children: [
-      
-    ]
+      {
+        path: "",
+        element: <Buttons />,
+      },
+    ],
   },
-  
-])
+  {
+    path: "/auth",
+    errorElement: <ErrorPage />,
+    children: [
+      {
+        path: "login",
+        element: <LoginPage />,
+      },
+      {
+        path: "register",
+        element: <RegisterPage />,
+      },
+      {
+        path: "recover-password",
+        element: <RecoverPage />,
+      },
+    ],
+  },
+]);
 
-export default router
-
+export default router;
 
 //   {
 //     path: "/",
@@ -40,5 +63,5 @@ export default router
 //       }
 //     ]
 //   },
-  
+
 // ])

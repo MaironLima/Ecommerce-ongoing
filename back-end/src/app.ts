@@ -8,6 +8,7 @@ import { requestLogger } from './common/utils/logmiddleware.js';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import userRoutes from './modules/auth/routes.js';
+import requireRole from './common/middleware/requireRole.js';
 
 const app = express();
 
@@ -19,7 +20,7 @@ app.use(morgan('combined'));
 app.use(requestLogger);
 app.use(
   helmet({
-    contentSecurityPolicy: false, // desativa quando usa React/Vite
+    contentSecurityPolicy: false,
     hidePoweredBy: true,
     frameguard: { action: 'deny' },
     hsts: {
@@ -33,25 +34,28 @@ app.use(
   }),
 );
 
+
+
+
 app.use(
-  '/api',
+  '/auth/recover-email',
   rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 200,
-    message: 'Too many requests.',
+    windowMs: 60 * 1000,
+    max: 1,
+    message: 'Wait a minute to a new request.',
     standardHeaders: true,
     legacyHeaders: false,
   }),
 );
 
-// app.use(
-//   "/auth/login",
-//   rateLimit({
-//     windowMs: 60 * 1000,
-//     max: 5,
-//     message: "Muitas tentativas. Aguarde 1 minuto.",
-//   })
-// );
+app.use(
+  "/auth/login",
+  rateLimit({
+    windowMs: 60 * 1000,
+    max: 5,
+    message: "Too many requests. Wait a minute.",
+  })
+);
 
 app.use('/ping', pingRoutes);
 app.use('/auth', userRoutes);
@@ -59,7 +63,7 @@ app.use('/auth', userRoutes);
 // app.use('/cart', cartRoutes);
 // app.use('/checkout', checkoutRoutes);
 // app.use('/orders', ordersRoutes);
-// app.use('/admin', adminRoutes);
+// app.use('/admin', requireRole(["ADMIN"]), adminRoutes);
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);

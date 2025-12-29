@@ -2,7 +2,7 @@
 function ErrorPage() {
   return (
     <div>
-        <p>ErrorPage</p>
+        <p>Error 404</p>
     </div>
   )
 }

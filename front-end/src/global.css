@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
 
 @layer base {
     :root {
@@ -80,7 +85,7 @@
     }
 
     .global-input {
-        @apply w-full px-3 py-2 rounded-md border bg-background text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary transition font-sans;
+        @apply w-full px-3 py-2 rounded-md border bg-input text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary transition font-sans;
     }
 
     .global-title {

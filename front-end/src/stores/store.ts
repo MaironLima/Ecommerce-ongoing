@@ -1,16 +1,21 @@
 import { create } from "zustand";
 
-interface BearState {
-  bears: number;
-  increasePopulation: () => void;
-  removeAllBears: () => void;
-  updateBears: (newBears: number) => void;
+interface TokenState {
+  accessToken: string;
+  setAccessToken: (token: string) => void
+  clearAccesToken: () => void
+
+  name: string;
+  setName: (name: string) => void
+  clearName: () => void
 }
 
-export const useBear = create<BearState>((set) => ({
-  bears: 0,
-  increasePopulation: () =>
-    set((state: BearState) => ({ bears: state.bears + 1 })),
-  removeAllBears: () => set({ bears: 0 }),
-  updateBears: (newBears: number) => set({ bears: newBears }),
-}));
+export const useStore = create<TokenState>((set) => ({
+  accessToken:"",
+  setAccessToken: (token) => set({accessToken: token}),
+  clearAccesToken: () => set({ accessToken: "" }),
+
+  name: "",
+  setName: (name) => set({name: name}),
+  clearName: () => set({ name: "" }),
+}))

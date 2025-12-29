@@ -44,6 +44,6 @@
     "esm": true,
     "experimentalEsm": true
   },
-  "include": ["src"],
+  "include": ["src", "global"],
   "exclude": ["node_modules", "dist"]
 }
