@@ -31,7 +31,7 @@ const router = createBrowserRouter([
         element: <RegisterPage />,
       },
       {
-        path: "recover-password",
+        path: "recover",
         element: <RecoverPage />,
       },
     ],

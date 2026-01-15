@@ -6,8 +6,7 @@ import { useStore } from "@/stores/store";
 function Header() {
   const [valor, setValor] = useState("");
 
-  const name = useStore().name;
-  const accessToken = useStore().accessToken;
+  const { name, accessToken } = useStore.getState();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -19,8 +18,8 @@ function Header() {
         <button type="button">
           <img src="/vite.svg" alt="Logo" className="h-10" />
         </button>
-        <h1>{name}|1</h1>
-        <h1>{accessToken.length}|2</h1>
+        <h1>{name}| 1</h1>
+        <h1>{accessToken.length}| 2</h1>
       </div>
       <form onSubmit={handleSubmit} className="flex gap-2">
         <input

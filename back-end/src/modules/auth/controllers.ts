@@ -68,6 +68,7 @@ export const logoutController = async (req: Request, res: Response) => {
 export const refreshController = async (req: Request, res: Response) => {
   try {
     const refreshToken = req.cookies.refreshToken;
+    console.log(refreshToken);
     if (!refreshToken) throw new Error('Without refresh token');
 
     const { newAccessToken } = await refreshService(refreshToken);
@@ -120,9 +121,9 @@ export const recoverPasswordController = async (req: Request, res: Response) => 
     const { newPassword } = req.body;
     const accessToken = req.headers.authorization as string;
 
-    await recoverPasswordService(accessToken, newPassword);
+    const { name } = await recoverPasswordService(accessToken, newPassword);
 
-    res.status(202).json({ message: 'Password changed successfuly'});
+    res.status(202).json({ message: 'Password changed successfuly', name });
   } catch (e) {
     return res
       .status(500)

@@ -12,36 +12,124 @@ import { Label } from "@/components/ui/label";
 import { CardAction } from "./ui/corrections";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { publicAPI } from "@/services/api/GlobalApi";
+import publicAPI from "@/services/api/publicApi";
 import { useStore } from "@/stores/store";
+import { useMutation } from "@tanstack/react-query";
+import { AlertCircleIcon } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import type { AxiosError } from "axios";
+import { Spinner } from "@/components/ui/spinner";
 
 export function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [mes, setMes] = useState(false);
+  const [wait, setWait] = useState(false);
 
   const navigate = useNavigate();
 
+  function popUp(): void {
+    setMes(true);
+    setTimeout(() => setMes(false), 8000);
+  }
+    function waitTime(): void {
+    setWait(true);
+    setTimeout(() => setWait(false), 3000);
+  }
+
+  const {
+    mutate: sendLogin,
+    isPending: isLoginPending,
+    isError: isLoginError,
+    error: loginError,
+  } = useMutation({
+    mutationFn: async () => {
+      const response = await publicAPI.post("/auth/login", { email, password });
+      return response.data;
+    },
+    onSuccess: (data) => {
+      const { setName, setAccessToken } = useStore.getState();
+      setName(data.name);
+      setAccessToken(data.accessToken);
+      navigate("/");
+    },
+    onError: () => {
+      waitTime()
+      popUp();
+    },
+  });
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    try {
-      const data = { email, password };
-
-      const { response } = await publicAPI("post", "/auth/login", data);
-
-      const { setName } = useStore.getState();
-      setName(response.data.name);
-
-      const { setAccessToken } = useStore.getState();
-      setAccessToken(response.data.accessToken);
-
-      await navigate("/");
-    } catch (e) {
-      alert(e);
+    if (wait) {
+      throw new Error("Wait 3 seconds and try again");
     }
+    e.preventDefault();
+    sendLogin();
+  };
+
+  const handleSignin = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    if (wait) {
+      throw new Error("Wait 3 seconds and try again");
+    }
+    navigate("/auth/register");
+  };
+
+  const handleRecover = async (
+    e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>
+  ) => {
+    if (wait) {
+      throw new Error("Wait 3 seconds and try again");
+    }
+    e.preventDefault();
+    navigate("/auth/recover");
+  };
+  const handleMainPage = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    navigate("/");
   };
 
   return (
     <div className="flex justify-center items-center min-h-screen">
+      <div
+        style={{
+          position: "fixed",
+          top: 16,
+          left: 16,
+          zIndex: 50,
+        }}
+      >
+        <button onClick={handleMainPage}>
+          <img src="/vite.svg" alt="Logo" className="h-10" />
+        </button>
+      </div>
+
+      <div
+        style={{
+          position: "fixed",
+          top: 32,
+          left: "50%",
+          transform: "translateX(-50%)",
+          zIndex: 50,
+          minWidth: 350,
+          maxWidth: "90vw",
+        }}
+      >
+        {mes && isLoginError && (
+          <Alert variant="destructive">
+            <AlertCircleIcon />
+            <AlertTitle>Something's going wrong.</AlertTitle>
+            <AlertDescription>
+              <p>
+                Erro:{" "}
+                {(loginError as AxiosError<{ error: string }>)?.response?.data
+                  ?.error || loginError.message}
+              </p>
+            </AlertDescription>
+          </Alert>
+        )}
+      </div>
+
       <Card className="justify-center items-center min-h-screenw-full max-w-sm">
         <CardHeader>
           <CardTitle>Login to your account</CardTitle>
@@ -71,6 +159,7 @@ export function LoginPage() {
                     <a
                       href="#"
                       className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                      onClick={handleRecover}
                     >
                       Forgot your password?
                     </a>
@@ -93,7 +182,9 @@ export function LoginPage() {
         </CardContent>
         <CardFooter className="flex-col gap-2">
           <CardAction className="ml-auto">
-            <Button variant="link">Sign Up</Button>
+            <Button variant="link" onClick={handleSignin}>
+              Sign Up {isLoginPending && <Spinner />}
+            </Button>
           </CardAction>
         </CardFooter>
       </Card>

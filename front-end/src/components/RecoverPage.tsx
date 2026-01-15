@@ -12,140 +12,232 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "./ui/field";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
-import { usePrivateAPI, usePublicAPI } from "@/services/api/GlobalApi";
 import { useNavigate } from "react-router-dom";
 import { AlertCircleIcon, CheckCircle2Icon } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Spinner } from "@/components/ui/spinner";
+import publicAPI from "@/services/api/publicApi";
+import { useMutation } from "@tanstack/react-query";
 import { useStore } from "@/stores/store";
+import privateAPI from "@/services/api/privateApi";
+import type { AxiosError } from "axios";
 
 export function RecoverPage() {
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [step, setStep] = useState<"email" | "code" | "password">("email");
   const [mes, setMes] = useState(false);
+  const [wait, setWait] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirm, setConfirm] = useState("");
 
   const navigate = useNavigate();
 
-  function popUp() {
+  function popUp(): void {
     setMes(true);
-    setTimeout(() => setMes(false), 5000);
+    setTimeout(() => setMes(false), 8000);
   }
 
-  // const {
-  //   refetch: sendEmail,
-  //   error: emailError,
-  //   isFetching: isEmailPending,
-  //   isSuccess: isEmailSuccess,
-  //   isError: isEmailError,
-  // } = usePublicAPI("post", "/auth/recover-email", { email }, {
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   onSuccess: () => {
-  //     setStep("code");
-  //     popUp();
-  //   }
-  // });
+  function waitTime(): void {
+    setWait(true);
+    setTimeout(() => setWait(false), 3000);
+  }
 
-  // const {
-  //   refetch: sendCode,
-  //   data: dataCode,
-  //   error: codeError,
-  //   isFetching: isCodePending,
-  //   isSuccess: isCodeSuccess,
-  //   isError: isCodeError,
-  // } = usePublicAPI("post", "/auth/recover-code", { code, email }, {
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   onSuccess: () => {
-      
-  //     setStep("password");
-  //     popUp();
-  //   }
-  // });
+  const {
+    mutate: sendEmail,
+    isPending: isEmailPending,
+    isSuccess: isEmailSuccess,
+    isError: isEmailError,
+    error: emailError,
+  } = useMutation({
+    mutationFn: async () => {
+      await publicAPI.post("/auth/recover-email", { email });
+    },
+    onSuccess: () => {
+      setStep("code");
+      popUp();
+    },
+    onError: () => {
+      waitTime();
+      popUp();
+    },
+  });
 
-  // const {
-  //   refetch: sendPassword,
-  //   error: passwordError,
-  //   isFetching: isPasswordPending,
-  //   isError: isPasswordError,
-  // } = usePrivateAPI("post", "/auth/recover-password", { password: newPassword }, {
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   onSuccess: (data) => {
-  //     const { setName, setAccessToken } = useStore.getState();
-  //     setName(data.response.data.name);
-  //     setAccessToken(data.response.data.accessToken);
-  //     navigate("/");
-  //   }
-  // });
+  const {
+    mutate: sendCode,
+    isPending: isCodePending,
+    isSuccess: isCodeSuccess,
+    isError: isCodeError,
+    error: codeError,
+  } = useMutation({
+    mutationFn: async () => {
+      const response = await publicAPI.post("/auth/recover-code", {
+        code,
+        email,
+      });
+      return response.data;
+    },
+    onSuccess: (data) => {
+      const { setAccessToken } = useStore.getState();
+      setAccessToken(data.accessToken);
+      setStep("password");
+      popUp();
+    },
+    onError: () => {
+      waitTime();
+      popUp();
+    },
+  });
+
+  const {
+    mutate: sendPassword,
+    isPending: isPasswordPending,
+    isError: isPasswordError,
+    error: passwordError,
+  } = useMutation({
+    mutationFn: async () => {
+      const response = await privateAPI.patch("/auth/recover-password", {
+        newPassword,
+      });
+      return response.data;
+    },
+    onSuccess: (data) => {
+      console.log(data.name);
+      const { setName } = useStore.getState();
+      setName(data.name);
+      navigate("/");
+    },
+    onError: () => {
+      waitTime();
+      popUp();
+    },
+  });
 
   const handleEmailSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (wait) {
+      throw new Error("Wait 3 seconds and try again");
+    }
     sendEmail();
   };
 
   const handleCodeSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (wait) {
+      throw new Error("Wait 3 seconds and try again");
+    }
     sendCode();
   };
 
   const handlePasswordSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (newPassword !== confirm) throw new Error("the passwords are not the same");
-
+    if (wait) {
+      throw new Error("Wait 3 seconds and try again");
+    }
+    if (newPassword !== confirm) {
+      throw new Error("the passwords are not the same");
+    }
     sendPassword();
+  };
+  const handleSignin = async (
+    e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>
+  ) => {
+    if (wait) {
+      throw new Error("Wait 3 seconds and try again");
+    }
+    e.preventDefault();
+    navigate("/auth/login");
+  };
+  const handleMainPage = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    navigate("/");
   };
 
   return (
     <div className="flex justify-center items-center min-h-screen">
-      {mes && isEmailSuccess && (
-        <Alert>
-          <CheckCircle2Icon />
-          <AlertTitle>Success! the code was sended to your email</AlertTitle>
-          <AlertDescription>
-            Open your email box and verify the code.
-          </AlertDescription>
-        </Alert>
-      )}
+      <div
+        style={{
+          position: "fixed",
+          top: 16,
+          left: 16,
+          zIndex: 50,
+        }}
+      >
+        <button onClick={handleMainPage}>
+          <img src="/vite.svg" alt="Logo" className="h-10" />
+        </button>
+      </div>
+      <div
+        style={{
+          position: "fixed",
+          top: 32,
+          left: "50%",
+          transform: "translateX(-50%)",
+          zIndex: 50,
+          minWidth: 350,
+          maxWidth: "90vw",
+        }}
+      >
+        {mes && isEmailSuccess && step === "code" && (
+          <Alert>
+            <CheckCircle2Icon />
+            <AlertTitle>Success! the code was sended to your email</AlertTitle>
+            <AlertDescription>
+              Open your email box and verify the code.
+            </AlertDescription>
+          </Alert>
+        )}
 
-      {mes && isEmailError && (
-        <Alert variant="destructive">
-          <AlertCircleIcon />
-          <AlertTitle>Something's going wrong.</AlertTitle>
-          <AlertDescription>
-            <p>Erro: {emailError.message}</p>
-          </AlertDescription>
-        </Alert>
-      )}
+        {mes && isEmailError && (
+          <Alert variant="destructive">
+            <AlertCircleIcon />
+            <AlertTitle>Something's going wrong.</AlertTitle>
+            <AlertDescription>
+              <p>
+                Erro:{" "}
+                {(emailError as AxiosError<{ error: string }>)?.response?.data
+                  ?.error || emailError.message}
+              </p>
+            </AlertDescription>
+          </Alert>
+        )}
 
-      {mes && isCodeSuccess && (
-        <Alert>
-          <CheckCircle2Icon />
-          <AlertTitle>Success! the code was correct</AlertTitle>
-          <AlertDescription>Choice your new password.</AlertDescription>
-        </Alert>
-      )}
+        {mes && isCodeSuccess && step === "password" && (
+          <Alert>
+            <CheckCircle2Icon />
+            <AlertTitle>Success! the code was correct</AlertTitle>
+            <AlertDescription>Choice your new password.</AlertDescription>
+          </Alert>
+        )}
 
-      {mes && isCodeError && (
-        <Alert variant="destructive">
-          <AlertCircleIcon />
-          <AlertTitle>Something's going wrong.</AlertTitle>
-          <AlertDescription>
-            <p>Erro: {codeError.message}</p>
-          </AlertDescription>
-        </Alert>
-      )}
+        {mes && isCodeError && (
+          <Alert variant="destructive">
+            <AlertCircleIcon />
+            <AlertTitle>Something's going wrong.</AlertTitle>
+            <AlertDescription>
+              <p>
+                Erro:{" "}
+                {(codeError as AxiosError<{ error: string }>)?.response?.data
+                  ?.error || codeError.message}
+              </p>
+            </AlertDescription>
+          </Alert>
+        )}
 
-      {mes && isPasswordError && (
-        <Alert variant="destructive">
-          <AlertCircleIcon />
-          <AlertTitle>Something's going wrong.</AlertTitle>
-          <AlertDescription>
-            <p>Erro: {passwordError.message}</p>
-          </AlertDescription>
-        </Alert>
-      )}
-
+        {mes && isPasswordError && (
+          <Alert variant="destructive">
+            <AlertCircleIcon />
+            <AlertTitle>Something's going wrong.</AlertTitle>
+            <AlertDescription>
+              <p>
+                Erro:{" "}
+                {(passwordError as AxiosError<{ error: string }>)?.response
+                  ?.data?.error || passwordError.message}
+              </p>
+            </AlertDescription>
+          </Alert>
+        )}
+      </div>
       {step === "email" && (
         <Card className="justify-center items-center min-h-screenw-full max-w-sm gap-4">
           <CardHeader>
@@ -174,7 +266,10 @@ export function RecoverPage() {
                 <Button type="submit" className="w-full">
                   Sent {isEmailPending && <Spinner />}
                 </Button>
-                Remember your password? <a href="#">Sign In</a>
+                Remember your password?{" "}
+                <a href="#" onClick={handleSignin}>
+                  Sign In
+                </a>
               </FieldDescription>
             </form>
           </CardContent>

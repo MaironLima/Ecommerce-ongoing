@@ -117,4 +117,6 @@ export async function recoverPasswordService(accessToken: string, newPassword:st
     }
   });
 
+  return { name: user.name };
+
 }

@@ -10,7 +10,7 @@ function Buttons() {
     navigate("/auth/register")
   }
   function recover () {
-    navigate("/auth/recover-password")
+    navigate("/auth/recover")
   }
 
   return (

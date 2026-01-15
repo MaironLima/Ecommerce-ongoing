@@ -12,7 +12,10 @@ import requireRole from './common/middleware/requireRole.js';
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -37,16 +40,16 @@ app.use(
 
 
 
-app.use(
-  '/auth/recover-email',
-  rateLimit({
-    windowMs: 60 * 1000,
-    max: 1,
-    message: 'Wait a minute to a new request.',
-    standardHeaders: true,
-    legacyHeaders: false,
-  }),
-);
+// app.use(
+//   '/auth/recover-email',
+//   rateLimit({
+//     windowMs: 60 * 1000,
+//     max: 1,
+//     message: 'Wait a minute to a new request.',
+//     standardHeaders: true,
+//     legacyHeaders: false,
+//   }),
+// );
 
 app.use(
   "/auth/login",
