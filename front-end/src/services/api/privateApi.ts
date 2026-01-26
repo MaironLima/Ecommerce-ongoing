@@ -40,7 +40,6 @@ privateAPI.interceptors.response.use(
         const { setAccessToken } = useStore.getState()
         setAccessToken(data.accessToken)
         // useStore.getState().setAccessToken(data.accessToken)=
-        console.log("asasddasddas", originalRequest)
         originalRequest.headers.Authorization = data.accessToken;
         return privateAPI(originalRequest);
         

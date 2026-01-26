@@ -10,11 +10,11 @@ import {
 
 const productsRoutes: Router = Router();
 
-productsRoutes.get('/', productsController);
-// productsRoutes.get('/:id', productsGetController);
-// productsRoutes.post('/', adminMiddleware, productsAddController);
-// productsRoutes.put('/:id', adminMiddleware, productAttController);
-// productsRoutes.delete('/:id', adminMiddleware, productDeleteController);
+productsRoutes.get('/products', productsController);
+productsRoutes.get('/products/:id', productsGetController);
 productsRoutes.get('/search', productsSearchController);
+productsRoutes.post('/products', productsAddController); // adm
+productsRoutes.put('/products/:id', productAttController); // adm
+productsRoutes.delete('/products/:id', productDeleteController); // adm
 
 export default productsRoutes;

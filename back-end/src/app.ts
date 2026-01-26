@@ -9,6 +9,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import userRoutes from './modules/auth/routes.js';
 import requireRole from './common/middleware/requireRole.js';
+import productsRoutes from './modules/cart/products/routes.js';
 
 const app = express();
 
@@ -40,16 +41,16 @@ app.use(
 
 
 
-// app.use(
-//   '/auth/recover-email',
-//   rateLimit({
-//     windowMs: 60 * 1000,
-//     max: 1,
-//     message: 'Wait a minute to a new request.',
-//     standardHeaders: true,
-//     legacyHeaders: false,
-//   }),
-// );
+app.use(
+  '/auth/recover-email',
+  rateLimit({
+    windowMs: 60 * 1000,
+    max: 1,
+    message: 'Wait a minute to a new request.',
+    standardHeaders: true,
+    legacyHeaders: false,
+  }),
+);
 
 app.use(
   "/auth/login",
@@ -62,7 +63,7 @@ app.use(
 
 app.use('/ping', pingRoutes);
 app.use('/auth', userRoutes);
-// app.use('/products', productsRoutes); // + review
+app.use('/products', productsRoutes); // + review
 // app.use('/cart', cartRoutes);
 // app.use('/checkout', checkoutRoutes);
 // app.use('/orders', ordersRoutes);

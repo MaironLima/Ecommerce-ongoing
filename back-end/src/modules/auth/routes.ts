@@ -8,7 +8,6 @@ import {
   refreshController,
   registerController,
 } from './controllers.js';
-import { jwtMiddleware } from '../../common/middleware/validate.js';
 import { auth } from '../../auth/middleware.js';
 
 const userRoutes: Router = Router();
