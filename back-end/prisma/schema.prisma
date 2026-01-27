@@ -3,15 +3,15 @@ datasource db {
 }
 
 generator client {
-    provider = "prisma-client"
-    output   = "../src/generated"
+    provider               = "prisma-client"
+    output                 = "../src/generated"
 }
 
 model User {
     id           String         @id @default(uuid())
     email        String         @unique
     password     String
-    name         String         
+    name         String
     role         Permissions
     created_at   DateTime       @default(now())
     updated_at   DateTime       @updatedAt

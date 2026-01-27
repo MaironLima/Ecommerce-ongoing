@@ -198,7 +198,7 @@ export function RegisterPage({ ...props }: React.ComponentProps<typeof Card>) {
               </Field>
               <FieldGroup>
                 <Field>
-                  <Button type="submit">Create Account</Button>
+                  <Button type="submit">Create Account {isRegisterPending && <Spinner />}</Button>
                   <FieldDescription className="px-6 text-center"></FieldDescription>
                 </Field>
               </FieldGroup>
@@ -206,7 +206,7 @@ export function RegisterPage({ ...props }: React.ComponentProps<typeof Card>) {
           </form>
           <CardAction className="ml-auto">
             <Button variant="link" onClick={handleSignup}>
-              Sign In {isRegisterPending && <Spinner />}
+              Sign In
             </Button>
           </CardAction>
         </CardContent>
