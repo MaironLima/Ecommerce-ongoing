@@ -26,16 +26,22 @@ export const productsGetController = async (req: Request, res: Response) => {
 
 export const productsAddController = async (req: Request, res: Response) => {
   try {
-    const { title, description, basePrice, category, mainImage, extraImages } = req.body;
+    const { title, description, basePrice, category } = req.body;
     if (!title) throw new Error('Without title');
     if (!basePrice) throw new Error('Without base price');
     if (!category) throw new Error('Without category');
+
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+    const mainImage = files && files['mainImage'] ? files['mainImage'][0] : undefined;
+    const extraImages = files && files['extraImages'] ? files['extraImages'] : [];
+
     if (!mainImage) throw new Error('Without main image');
 
-    await productsAddService(title, description, basePrice, category, mainImage, extraImages)
+    await productsAddService(title, description, basePrice, category, mainImage, extraImages);
 
-    res.status(201)
+    res.status(201).json({ message: 'Product added successfully' });
   } catch (e) {
+    console.log(e)
     res.status(500).json({ error: 'Internal server error' });
   }
 };

@@ -3,8 +3,8 @@ datasource db {
 }
 
 generator client {
-    provider               = "prisma-client"
-    output                 = "../src/generated"
+    provider = "prisma-client"
+    output   = "../src/generated"
 }
 
 model User {
@@ -65,8 +65,7 @@ model ProductVariant {
 
 model Category {
     id               String            @id @default(uuid())
-    name             String
-    slug             String            @unique
+    name             String            @unique
     product_category ProductCategory[]
 
     @@map("category")
