@@ -1,13 +1,11 @@
+
 import multer from "multer";
-import path from "path";
 
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: path.resolve(__dirname, "..", "/imagens/uploads"),
-    filename: (req, file, cb) => {
-      cb(null, file.originalname);
-    }
-  })
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB
+  }
 });
 
 export default upload

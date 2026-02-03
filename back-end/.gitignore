@@ -32,3 +32,6 @@ coverage/
 
 # Misc
 *.tgz
+
+# Imagens
+imagens/uploads/*webp

@@ -86,7 +86,13 @@ export const refreshController = async (req: Request, res: Response) => {
 
 export const recoverEmailController = async (req: Request, res: Response) => {
   try {
-    const { email } = req.body;
+    const parsed = userSchema.safeParse(req.body);
+    if (!parsed.success) {
+      const firstMessage = parsed.error.issues[0]?.message || 'Validation error';
+      return res.status(400).json({ error: firstMessage });
+    }
+
+    const { email } = parsed.data;
 
     await recoverEmailService(email);
 
@@ -100,7 +106,13 @@ export const recoverEmailController = async (req: Request, res: Response) => {
 
 export const recoverCodeController = async (req: Request, res: Response) => {
   try {
-    const { code, email } = req.body;
+    const parsed = userSchema.safeParse(req.body);
+    if (!parsed.success) {
+      const firstMessage = parsed.error.issues[0]?.message || 'Validation error';
+      return res.status(400).json({ error: firstMessage });
+    }
+
+    const { code, email } = parsed.data;
 
     if (!codes[email]) throw new Error('No code generated for this email');
     if (codes[email] !== Number(code)) throw new Error('Invalid code');
@@ -118,7 +130,13 @@ export const recoverCodeController = async (req: Request, res: Response) => {
 
 export const recoverPasswordController = async (req: Request, res: Response) => {
   try {
-    const { newPassword } = req.body;
+    const parsed = userSchema.safeParse(req.body);
+    if (!parsed.success) {
+      const firstMessage = parsed.error.issues[0]?.message || 'Validation error';
+      return res.status(400).json({ error: firstMessage });
+    }
+
+    const { password: newPassword } = parsed.data;
     const accessToken = req.headers.authorization as string;
 
     const { name } = await recoverPasswordService(accessToken, newPassword);

@@ -11,12 +11,12 @@ import { uploadMiddleware } from '../../../common/middleware/uploads';
 
 const productsRoutes: Router = Router();
 
-productsRoutes.get('/products', productsController);
-productsRoutes.get('/products/:id', productsGetController);
+productsRoutes.get('/', productsController);
+productsRoutes.get('/:id', productsGetController);
 productsRoutes.get('/search', productsSearchController);
-productsRoutes.post('/products', uploadMiddleware, productsAddController); // adm
-productsRoutes.put('/products/:id', productAttController); // adm
-productsRoutes.delete('/products/:id', productDeleteController); // adm
+productsRoutes.post('/', uploadMiddleware, productsAddController); // adm
+productsRoutes.put('/:id', uploadMiddleware, productAttController); // adm
+productsRoutes.delete('/:id', productDeleteController); // adm
 
 
 export default productsRoutes;
