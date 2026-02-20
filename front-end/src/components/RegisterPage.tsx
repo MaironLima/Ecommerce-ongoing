@@ -7,7 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { AxiosError } from "axios";
 import {
   Field,
   FieldDescription,
@@ -23,6 +22,7 @@ import { useStore } from "@/stores/store";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { Spinner } from "@/components/ui/spinner";
+import { errorHandler } from "@/services/errorHandler";
 
 export function RegisterPage({ ...props }: React.ComponentProps<typeof Card>) {
   const [name, setName] = useState("");
@@ -125,8 +125,7 @@ export function RegisterPage({ ...props }: React.ComponentProps<typeof Card>) {
             <AlertDescription>
               <p>
                 Erro:{" "}
-                {(registerError as AxiosError<{ error: string }>)?.response
-                  ?.data?.error || registerError.message}
+                {errorHandler(registerError)}
               </p>
             </AlertDescription>
           </Alert>

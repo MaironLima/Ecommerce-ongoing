@@ -21,7 +21,7 @@ async function processImagesWithSharp(req: Request, res: Response, next: NextFun
   try {
     // mainImage
     if (req.files && !Array.isArray(req.files) && req.files.mainImage && req.files.mainImage[0]) {
-      const imageBuffer = (req.files.mainImage[0] as Express.Multer.File).buffer;
+        const imageBuffer = (req.files.mainImage[0] as Express.Multer.File).buffer;
       const originalName = req.files.mainImage[0].originalname;
       const webpName = path.parse(originalName).name + ".webp";
       const uploadPath = path.resolve(__dirname, "../../imagens/uploads", webpName);

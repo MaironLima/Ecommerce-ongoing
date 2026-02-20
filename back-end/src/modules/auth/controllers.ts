@@ -8,7 +8,7 @@ import {
   refreshService,
   registerService,
 } from './services.js';
-import userSchema from './dto.js';
+import { codeSchema, emailSchema, passwordSchema, userSchema } from './dto.js';
 
 export const registerController = async (req: Request, res: Response) => {
   try {
@@ -86,7 +86,7 @@ export const refreshController = async (req: Request, res: Response) => {
 
 export const recoverEmailController = async (req: Request, res: Response) => {
   try {
-    const parsed = userSchema.safeParse(req.body);
+    const parsed = emailSchema.safeParse(req.body);
     if (!parsed.success) {
       const firstMessage = parsed.error.issues[0]?.message || 'Validation error';
       return res.status(400).json({ error: firstMessage });
@@ -98,6 +98,7 @@ export const recoverEmailController = async (req: Request, res: Response) => {
 
     res.status(202).json({ message: 'Code sent' });
   } catch (e) {
+console.error(e);
     return res
       .status(500)
       .json({ error: e instanceof Error ? e.message : 'Internal server error' });
@@ -106,7 +107,7 @@ export const recoverEmailController = async (req: Request, res: Response) => {
 
 export const recoverCodeController = async (req: Request, res: Response) => {
   try {
-    const parsed = userSchema.safeParse(req.body);
+    const parsed = codeSchema.safeParse(req.body);
     if (!parsed.success) {
       const firstMessage = parsed.error.issues[0]?.message || 'Validation error';
       return res.status(400).json({ error: firstMessage });
@@ -130,13 +131,13 @@ export const recoverCodeController = async (req: Request, res: Response) => {
 
 export const recoverPasswordController = async (req: Request, res: Response) => {
   try {
-    const parsed = userSchema.safeParse(req.body);
+    const parsed = passwordSchema.safeParse(req.body);
     if (!parsed.success) {
       const firstMessage = parsed.error.issues[0]?.message || 'Validation error';
       return res.status(400).json({ error: firstMessage });
     }
 
-    const { password: newPassword } = parsed.data;
+    const { newPassword } = parsed.data;
     const accessToken = req.headers.authorization as string;
 
     const { name } = await recoverPasswordService(accessToken, newPassword);

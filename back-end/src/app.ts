@@ -41,16 +41,6 @@ app.use(
 
 
 
-app.use(
-  '/auth/recover-email',
-  rateLimit({
-    windowMs: 60 * 1000,
-    max: 1,
-    message: 'Wait a minute to a new request.',
-    standardHeaders: true,
-    legacyHeaders: false,
-  }),
-);
 
 app.use(
   "/auth/login",
@@ -60,6 +50,27 @@ app.use(
     message: "Too many requests. Wait a minute.",
   })
 );
+
+app.use(
+  "/auth/register",
+  rateLimit({
+    windowMs: 60 * 1000,
+    max: 5,
+    message: "Too many requests. Wait a minute.",
+  })
+);
+
+app.use(
+  '/auth/recover-email',
+  rateLimit({
+    windowMs: 60 * 1000,
+    max: 3,
+    message: 'Wait a minute to a new request.',
+    standardHeaders: true,
+    legacyHeaders: false,
+  }),
+);
+
 
 app.use('/ping', pingRoutes);
 app.use('/auth', userRoutes);
