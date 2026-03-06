@@ -60,8 +60,8 @@ export async function productsAddService(
           optimized: true,
         })),
       });
-      if (images.count === 0)
-        throw new Error('It was not possible to sync extra images to the product');
+      if (images.count === 0){
+        throw new Error('It was not possible to sync extra images to the product');}
     }
   });
 }
