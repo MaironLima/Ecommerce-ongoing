@@ -20,7 +20,7 @@ import publicAPI from "@/services/api/publicApi";
 import { useMutation } from "@tanstack/react-query";
 import { useStore } from "@/stores/store";
 import privateAPI from "@/services/api/privateApi";
-import type { AxiosError } from "axios";
+import { errorHandler } from "@/services/errorHandler";
 
 export function RecoverPage() {
   const [email, setEmail] = useState("");
@@ -30,6 +30,7 @@ export function RecoverPage() {
   const [wait, setWait] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [noMore, setNoMore] = useState(true);
 
   const navigate = useNavigate();
 
@@ -56,10 +57,12 @@ export function RecoverPage() {
     onSuccess: () => {
       setStep("code");
       popUp();
+      setNoMore(true)
     },
     onError: () => {
       waitTime();
       popUp();
+      setNoMore(false)
     },
   });
 
@@ -82,10 +85,12 @@ export function RecoverPage() {
       setAccessToken(data.accessToken);
       setStep("password");
       popUp();
+      setNoMore(true)
     },
     onError: () => {
       waitTime();
       popUp();
+      setNoMore(false)
     },
   });
 
@@ -102,14 +107,15 @@ export function RecoverPage() {
       return response.data;
     },
     onSuccess: (data) => {
-      console.log(data.name);
       const { setName } = useStore.getState();
       setName(data.name);
       navigate("/");
+      setNoMore(true);
     },
     onError: () => {
       waitTime();
       popUp();
+      setNoMore(false)
     },
   });
 
@@ -178,7 +184,7 @@ export function RecoverPage() {
           maxWidth: "90vw",
         }}
       >
-        {mes && isEmailSuccess && step === "code" && (
+        {mes && isEmailSuccess && step === "code" && noMore && (
           <Alert>
             <CheckCircle2Icon />
             <AlertTitle>Success! the code was sended to your email</AlertTitle>
@@ -195,14 +201,13 @@ export function RecoverPage() {
             <AlertDescription>
               <p>
                 Erro:{" "}
-                {(emailError as AxiosError<{ error: string }>)?.response?.data
-                  ?.error || emailError.message}
+                { errorHandler(emailError) }
               </p>
             </AlertDescription>
           </Alert>
         )}
 
-        {mes && isCodeSuccess && step === "password" && (
+        {mes && isCodeSuccess && step === "password" && noMore && (
           <Alert>
             <CheckCircle2Icon />
             <AlertTitle>Success! the code was correct</AlertTitle>
@@ -217,8 +222,7 @@ export function RecoverPage() {
             <AlertDescription>
               <p>
                 Erro:{" "}
-                {(codeError as AxiosError<{ error: string }>)?.response?.data
-                  ?.error || codeError.message}
+                {errorHandler(codeError)}
               </p>
             </AlertDescription>
           </Alert>
@@ -231,8 +235,7 @@ export function RecoverPage() {
             <AlertDescription>
               <p>
                 Erro:{" "}
-                {(passwordError as AxiosError<{ error: string }>)?.response
-                  ?.data?.error || passwordError.message}
+                {errorHandler(passwordError)}
               </p>
             </AlertDescription>
           </Alert>
