@@ -42,7 +42,7 @@ model Product {
     id               String            @id @default(uuid())
     title            String
     description      String
-    base_price       Float
+    base_price       Decimal           @db.Decimal(10, 2)
     main_image       String
     product_variant  ProductVariant[]
     product_caregory ProductCategory[]
@@ -55,6 +55,10 @@ model Product {
 model ProductVariant {
     id                    String                 @id @default(uuid())
     product_id            String
+    sku                   String                 @unique
+    attributes            Json
+    stock                 Int                    @default(0)
+    price_override        Decimal?               @db.Decimal(10, 2)
     cart_item             CartItem[]
     inventory_reservation InventoryReservation[]
 

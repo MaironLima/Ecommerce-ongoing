@@ -453,6 +453,14 @@ export type CartItemUncheckedUpdateManyWithoutCart_syncNestedInput = {
   deleteMany?: Prisma.CartItemScalarWhereInput | Prisma.CartItemScalarWhereInput[]
 }
 
+export type FloatFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type CartItemCreateWithoutVariant_syncInput = {
   id?: string
   quantity?: number

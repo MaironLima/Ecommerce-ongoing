@@ -1,43 +1,52 @@
 // import { Request, Response } from 'express';
 
-// export const productsController = async (req: Request, res: Response) => {
-//   try {
-//   } catch (e) {
-//     res.status(500).json({ error: 'Internal server error' });
-//   }
-// };
+// import {
+//   productVariantCreateService,
+//   productVariantGetService,
+//   productVariantUpdateService,
+//   productVariantDeleteService,
+// } from './services';
 
-// export const productsGetController = async (req: Request, res: Response) => {
+// export async function createProductVariant(req:Request, res:Response) {
 //   try {
-//   } catch (e) {
-//     res.status(500).json({ error: 'Internal server error' });
-//   }
-// };
+//     const { name } = req.body;
 
-// export const productsAddController = async (req: Request, res: Response) => {
-//   try {
-//   } catch (e) {
-//     res.status(500).json({ error: 'Internal server error' });
-//   }
-// };
+//     const variant = await productVariantCreateService(productId, data);
 
-// export const productAttController = async (req: Request, res: Response) => {
-//   try {
-//   } catch (e) {
-//     res.status(500).json({ error: 'Internal server error' });
+//     res.status(201).json(variant);
+//   } catch (e:any) {
+//     res.status(400).json({ error: e.message });
 //   }
-// };
+// }
 
-// export const productDeleteController = async (req: Request, res: Response) => {
+// export async function getProductVariant(req:Request, res:Response) {
 //   try {
-//   } catch (e) {
-//     res.status(500).json({ error: 'Internal server error' });
+//     const { id } = req.params;
+//     const variant = await productVariantGetService(id);
+//     if (!variant) return res.status(404).json({ error: 'Variant not found' });
+//     res.json(variant);
+//   } catch (e:any) {
+//     res.status(400).json({ error: e.message });
 //   }
-// };
+// }
 
-// export const productsSearchController = async (req: Request, res: Response) => {
+// export async function updateProductVariant(req:Request, res:Response) {
 //   try {
-//   } catch (e) {
-//     res.status(500).json({ error: 'Internal server error' });
+//     const { id } = req.params;
+//     const data = req.body;
+//     const variant = await productVariantUpdateService(id, data);
+//     res.json(variant);
+//   } catch (e:any) {
+//     res.status(400).json({ error: e.message });
 //   }
-// };
+// }
+
+// export async function deleteProductVariant(req:Request, res:Response) {
+//   try {
+//     const { id } = req.params;
+//     await productVariantDeleteService(id);
+//     res.status(204).end();
+//   } catch (e:any) {
+//     res.status(400).json({ error: e.message });
+//   }
+// }

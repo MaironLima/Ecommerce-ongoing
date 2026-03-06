@@ -27,18 +27,18 @@ export type AggregateProduct = {
 }
 
 export type ProductAvgAggregateOutputType = {
-  base_price: number | null
+  base_price: runtime.Decimal | null
 }
 
 export type ProductSumAggregateOutputType = {
-  base_price: number | null
+  base_price: runtime.Decimal | null
 }
 
 export type ProductMinAggregateOutputType = {
   id: string | null
   title: string | null
   description: string | null
-  base_price: number | null
+  base_price: runtime.Decimal | null
   main_image: string | null
 }
 
@@ -46,7 +46,7 @@ export type ProductMaxAggregateOutputType = {
   id: string | null
   title: string | null
   description: string | null
-  base_price: number | null
+  base_price: runtime.Decimal | null
   main_image: string | null
 }
 
@@ -183,7 +183,7 @@ export type ProductGroupByOutputType = {
   id: string
   title: string
   description: string
-  base_price: number
+  base_price: runtime.Decimal
   main_image: string
   _count: ProductCountAggregateOutputType | null
   _avg: ProductAvgAggregateOutputType | null
@@ -214,7 +214,7 @@ export type ProductWhereInput = {
   id?: Prisma.StringFilter<"Product"> | string
   title?: Prisma.StringFilter<"Product"> | string
   description?: Prisma.StringFilter<"Product"> | string
-  base_price?: Prisma.FloatFilter<"Product"> | number
+  base_price?: Prisma.DecimalFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   main_image?: Prisma.StringFilter<"Product"> | string
   product_variant?: Prisma.ProductVariantListRelationFilter
   product_caregory?: Prisma.ProductCategoryListRelationFilter
@@ -241,7 +241,7 @@ export type ProductWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.ProductWhereInput | Prisma.ProductWhereInput[]
   title?: Prisma.StringFilter<"Product"> | string
   description?: Prisma.StringFilter<"Product"> | string
-  base_price?: Prisma.FloatFilter<"Product"> | number
+  base_price?: Prisma.DecimalFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   main_image?: Prisma.StringFilter<"Product"> | string
   product_variant?: Prisma.ProductVariantListRelationFilter
   product_caregory?: Prisma.ProductCategoryListRelationFilter
@@ -269,7 +269,7 @@ export type ProductScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Product"> | string
   title?: Prisma.StringWithAggregatesFilter<"Product"> | string
   description?: Prisma.StringWithAggregatesFilter<"Product"> | string
-  base_price?: Prisma.FloatWithAggregatesFilter<"Product"> | number
+  base_price?: Prisma.DecimalWithAggregatesFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   main_image?: Prisma.StringWithAggregatesFilter<"Product"> | string
 }
 
@@ -277,7 +277,7 @@ export type ProductCreateInput = {
   id?: string
   title: string
   description: string
-  base_price: number
+  base_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   main_image: string
   product_variant?: Prisma.ProductVariantCreateNestedManyWithoutProduct_syncInput
   product_caregory?: Prisma.ProductCategoryCreateNestedManyWithoutProduct_syncInput
@@ -289,7 +289,7 @@ export type ProductUncheckedCreateInput = {
   id?: string
   title: string
   description: string
-  base_price: number
+  base_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   main_image: string
   product_variant?: Prisma.ProductVariantUncheckedCreateNestedManyWithoutProduct_syncInput
   product_caregory?: Prisma.ProductCategoryUncheckedCreateNestedManyWithoutProduct_syncInput
@@ -301,7 +301,7 @@ export type ProductUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
-  base_price?: Prisma.FloatFieldUpdateOperationsInput | number
+  base_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   main_image?: Prisma.StringFieldUpdateOperationsInput | string
   product_variant?: Prisma.ProductVariantUpdateManyWithoutProduct_syncNestedInput
   product_caregory?: Prisma.ProductCategoryUpdateManyWithoutProduct_syncNestedInput
@@ -313,7 +313,7 @@ export type ProductUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
-  base_price?: Prisma.FloatFieldUpdateOperationsInput | number
+  base_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   main_image?: Prisma.StringFieldUpdateOperationsInput | string
   product_variant?: Prisma.ProductVariantUncheckedUpdateManyWithoutProduct_syncNestedInput
   product_caregory?: Prisma.ProductCategoryUncheckedUpdateManyWithoutProduct_syncNestedInput
@@ -325,7 +325,7 @@ export type ProductCreateManyInput = {
   id?: string
   title: string
   description: string
-  base_price: number
+  base_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   main_image: string
 }
 
@@ -333,7 +333,7 @@ export type ProductUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
-  base_price?: Prisma.FloatFieldUpdateOperationsInput | number
+  base_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   main_image?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -341,7 +341,7 @@ export type ProductUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
-  base_price?: Prisma.FloatFieldUpdateOperationsInput | number
+  base_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   main_image?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -382,12 +382,12 @@ export type ProductScalarRelationFilter = {
   isNot?: Prisma.ProductWhereInput
 }
 
-export type FloatFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
+export type DecimalFieldUpdateOperationsInput = {
+  set?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type ProductCreateNestedOneWithoutProduct_variantInput = {
@@ -450,7 +450,7 @@ export type ProductCreateWithoutProduct_variantInput = {
   id?: string
   title: string
   description: string
-  base_price: number
+  base_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   main_image: string
   product_caregory?: Prisma.ProductCategoryCreateNestedManyWithoutProduct_syncInput
   extra_imagens?: Prisma.ExtraImagensCreateNestedManyWithoutProduct_syncInput
@@ -461,7 +461,7 @@ export type ProductUncheckedCreateWithoutProduct_variantInput = {
   id?: string
   title: string
   description: string
-  base_price: number
+  base_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   main_image: string
   product_caregory?: Prisma.ProductCategoryUncheckedCreateNestedManyWithoutProduct_syncInput
   extra_imagens?: Prisma.ExtraImagensUncheckedCreateNestedManyWithoutProduct_syncInput
@@ -488,7 +488,7 @@ export type ProductUpdateWithoutProduct_variantInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
-  base_price?: Prisma.FloatFieldUpdateOperationsInput | number
+  base_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   main_image?: Prisma.StringFieldUpdateOperationsInput | string
   product_caregory?: Prisma.ProductCategoryUpdateManyWithoutProduct_syncNestedInput
   extra_imagens?: Prisma.ExtraImagensUpdateManyWithoutProduct_syncNestedInput
@@ -499,7 +499,7 @@ export type ProductUncheckedUpdateWithoutProduct_variantInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
-  base_price?: Prisma.FloatFieldUpdateOperationsInput | number
+  base_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   main_image?: Prisma.StringFieldUpdateOperationsInput | string
   product_caregory?: Prisma.ProductCategoryUncheckedUpdateManyWithoutProduct_syncNestedInput
   extra_imagens?: Prisma.ExtraImagensUncheckedUpdateManyWithoutProduct_syncNestedInput
@@ -510,7 +510,7 @@ export type ProductCreateWithoutProduct_caregoryInput = {
   id?: string
   title: string
   description: string
-  base_price: number
+  base_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   main_image: string
   product_variant?: Prisma.ProductVariantCreateNestedManyWithoutProduct_syncInput
   extra_imagens?: Prisma.ExtraImagensCreateNestedManyWithoutProduct_syncInput
@@ -521,7 +521,7 @@ export type ProductUncheckedCreateWithoutProduct_caregoryInput = {
   id?: string
   title: string
   description: string
-  base_price: number
+  base_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   main_image: string
   product_variant?: Prisma.ProductVariantUncheckedCreateNestedManyWithoutProduct_syncInput
   extra_imagens?: Prisma.ExtraImagensUncheckedCreateNestedManyWithoutProduct_syncInput
@@ -548,7 +548,7 @@ export type ProductUpdateWithoutProduct_caregoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
-  base_price?: Prisma.FloatFieldUpdateOperationsInput | number
+  base_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   main_image?: Prisma.StringFieldUpdateOperationsInput | string
   product_variant?: Prisma.ProductVariantUpdateManyWithoutProduct_syncNestedInput
   extra_imagens?: Prisma.ExtraImagensUpdateManyWithoutProduct_syncNestedInput
@@ -559,7 +559,7 @@ export type ProductUncheckedUpdateWithoutProduct_caregoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
-  base_price?: Prisma.FloatFieldUpdateOperationsInput | number
+  base_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   main_image?: Prisma.StringFieldUpdateOperationsInput | string
   product_variant?: Prisma.ProductVariantUncheckedUpdateManyWithoutProduct_syncNestedInput
   extra_imagens?: Prisma.ExtraImagensUncheckedUpdateManyWithoutProduct_syncNestedInput
@@ -570,7 +570,7 @@ export type ProductCreateWithoutExtra_imagensInput = {
   id?: string
   title: string
   description: string
-  base_price: number
+  base_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   main_image: string
   product_variant?: Prisma.ProductVariantCreateNestedManyWithoutProduct_syncInput
   product_caregory?: Prisma.ProductCategoryCreateNestedManyWithoutProduct_syncInput
@@ -581,7 +581,7 @@ export type ProductUncheckedCreateWithoutExtra_imagensInput = {
   id?: string
   title: string
   description: string
-  base_price: number
+  base_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   main_image: string
   product_variant?: Prisma.ProductVariantUncheckedCreateNestedManyWithoutProduct_syncInput
   product_caregory?: Prisma.ProductCategoryUncheckedCreateNestedManyWithoutProduct_syncInput
@@ -608,7 +608,7 @@ export type ProductUpdateWithoutExtra_imagensInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
-  base_price?: Prisma.FloatFieldUpdateOperationsInput | number
+  base_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   main_image?: Prisma.StringFieldUpdateOperationsInput | string
   product_variant?: Prisma.ProductVariantUpdateManyWithoutProduct_syncNestedInput
   product_caregory?: Prisma.ProductCategoryUpdateManyWithoutProduct_syncNestedInput
@@ -619,7 +619,7 @@ export type ProductUncheckedUpdateWithoutExtra_imagensInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
-  base_price?: Prisma.FloatFieldUpdateOperationsInput | number
+  base_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   main_image?: Prisma.StringFieldUpdateOperationsInput | string
   product_variant?: Prisma.ProductVariantUncheckedUpdateManyWithoutProduct_syncNestedInput
   product_caregory?: Prisma.ProductCategoryUncheckedUpdateManyWithoutProduct_syncNestedInput
@@ -630,7 +630,7 @@ export type ProductCreateWithoutReviewInput = {
   id?: string
   title: string
   description: string
-  base_price: number
+  base_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   main_image: string
   product_variant?: Prisma.ProductVariantCreateNestedManyWithoutProduct_syncInput
   product_caregory?: Prisma.ProductCategoryCreateNestedManyWithoutProduct_syncInput
@@ -641,7 +641,7 @@ export type ProductUncheckedCreateWithoutReviewInput = {
   id?: string
   title: string
   description: string
-  base_price: number
+  base_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   main_image: string
   product_variant?: Prisma.ProductVariantUncheckedCreateNestedManyWithoutProduct_syncInput
   product_caregory?: Prisma.ProductCategoryUncheckedCreateNestedManyWithoutProduct_syncInput
@@ -668,7 +668,7 @@ export type ProductUpdateWithoutReviewInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
-  base_price?: Prisma.FloatFieldUpdateOperationsInput | number
+  base_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   main_image?: Prisma.StringFieldUpdateOperationsInput | string
   product_variant?: Prisma.ProductVariantUpdateManyWithoutProduct_syncNestedInput
   product_caregory?: Prisma.ProductCategoryUpdateManyWithoutProduct_syncNestedInput
@@ -679,7 +679,7 @@ export type ProductUncheckedUpdateWithoutReviewInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
-  base_price?: Prisma.FloatFieldUpdateOperationsInput | number
+  base_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   main_image?: Prisma.StringFieldUpdateOperationsInput | string
   product_variant?: Prisma.ProductVariantUncheckedUpdateManyWithoutProduct_syncNestedInput
   product_caregory?: Prisma.ProductCategoryUncheckedUpdateManyWithoutProduct_syncNestedInput
@@ -804,7 +804,7 @@ export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     id: string
     title: string
     description: string
-    base_price: number
+    base_price: runtime.Decimal
     main_image: string
   }, ExtArgs["result"]["product"]>
   composites: {}
@@ -1236,7 +1236,7 @@ export interface ProductFieldRefs {
   readonly id: Prisma.FieldRef<"Product", 'String'>
   readonly title: Prisma.FieldRef<"Product", 'String'>
   readonly description: Prisma.FieldRef<"Product", 'String'>
-  readonly base_price: Prisma.FieldRef<"Product", 'Float'>
+  readonly base_price: Prisma.FieldRef<"Product", 'Decimal'>
   readonly main_image: Prisma.FieldRef<"Product", 'String'>
 }
     

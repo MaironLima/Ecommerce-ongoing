@@ -77,14 +77,13 @@ export async function productsAttService(
 ) {
   return prisma.$transaction(async tx => {
     const currentProduct = await tx.product.findUnique({ where: { id } });
-    if(!currentProduct) throw new Error("Product not found")
+    if (!currentProduct) throw new Error('Product not found');
 
     const updateData: any = {};
     if (title) updateData.title = title;
     if (description) updateData.description = description;
     if (basePrice) updateData.base_price = Number(basePrice);
     if (mainImagePath) updateData.main_image = mainImagePath;
-
 
     const updatedProduct = await tx.product.update({
       where: { id },
@@ -120,6 +119,7 @@ export async function productsAttService(
       });
       if (images.count === 0) throw new Error('Não foi possível atualizar imagens extras');
     }
+
     return updatedProduct;
   });
 }

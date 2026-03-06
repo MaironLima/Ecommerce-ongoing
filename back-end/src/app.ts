@@ -8,8 +8,8 @@ import { requestLogger } from './common/utils/logmiddleware.js';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import userRoutes from './modules/auth/routes.js';
-import requireRole from './common/middleware/requireRole.js';
 import productsRoutes from './modules/cart/products/routes.js';
+import productsVariantRoutes from './modules/cart/variants/routes.js';
 
 const app = express();
 

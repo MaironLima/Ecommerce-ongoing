@@ -1,7 +1,6 @@
 import upload from "../../config/multer";
 import { Request, Response, NextFunction } from "express";
 import sharp from "sharp";
-import fs from "fs";
 import path from "path";
 
 const uploadMaxCountMiddleware = upload.fields([
@@ -61,4 +60,9 @@ const uploadMiddleware = [
   processImagesWithSharp,
 ];
 
-export { uploadMiddleware };
+const uploadMiddlewareNotMandatory = [
+  uploadMaxCountMiddleware,
+  processImagesWithSharp,
+];
+
+export { uploadMiddleware, uploadMiddlewareNotMandatory };
