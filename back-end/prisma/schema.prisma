@@ -55,7 +55,6 @@ model Product {
 model ProductVariant {
     id                    String                 @id @default(uuid())
     product_id            String
-    sku                   String                 @unique
     attributes            Json
     stock                 Int                    @default(0)
     price_override        Decimal?               @db.Decimal(10, 2)

@@ -8,7 +8,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/morgan": "^1.9.10",
     "@types/multer": "^2.0.0",
-    "@types/node": "^24.10.1",
+    "@types/node": "^24.12.0",
     "@types/nodemailer": "^7.0.4",
     "@types/pg": "^8.15.6",
     "@types/winston": "^2.4.4",
@@ -27,7 +27,7 @@
   "main": "src/app.ts",
   "scripts": {
     "start": "node dist/app.js",
-    "dev": "nodemon",
+    "dev": "nodemon src/app.ts",
     "build": "tsc",
     "build:watch": "tsc --watch",
     "clean": "rimraf dist",
@@ -36,7 +36,8 @@
     "lint": "eslint src --ext .ts,.js",
     "lint:fix": "eslint src --ext .ts,.js --fix",
     "format": "prettier --write \"src/**/*.{ts,js,json}\"",
-    "lint:format": "npm run lint:fix && npm run format"
+    "lint:format": "npm run lint:fix && npm run format",
+    "prisma:dev": "npx prisma migrate dev"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.1.0",
@@ -56,5 +57,8 @@
     "sharp": "^0.34.5",
     "winston": "^3.18.3",
     "zod": "^4.1.12"
+  },
+  "prisma": {
+    "schema": "back-end/prisma/schema.prisma"
   }
 }

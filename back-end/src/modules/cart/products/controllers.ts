@@ -7,7 +7,7 @@ import {
   productsService,
 } from './services';
 import path from 'path';
-import productSchema from './dto';
+import { productSchema, productAttSchema } from './dto';
 
 export const productsController = async (req: Request, res: Response) => {
   try {
@@ -47,19 +47,35 @@ export const productsAddController = async (req: Request, res: Response) => {
       return res.status(400).json({ error: firstMessage });
     }
 
-    const { title, description, basePrice, category } = parsed.data;
+    const { title, description, basePrice, category, stock } = parsed.data;
     if (!title) throw new Error('Without title');
     if (!basePrice) throw new Error('Without base price');
     if (!category) throw new Error('Without category');
+    if (!stock) throw new Error('Without stock');
 
+    const attributes = JSON.parse(req.body.attributes);
+    if (!attributes) throw new Error('Without Attributes');
+    
     const mainImageWebp = req.body.mainImageWebp;
     const extraImagesWebp = req.body.extraImagesWebp || [];
 
     if (!mainImageWebp) throw new Error('Without main image');
 
     const mainImagePath = path.resolve(__dirname, '../../../imagens/uploads', mainImageWebp);
-    const extraImagesPaths = extraImagesWebp.map((img: string) => path.resolve(__dirname, '../../../imagens/uploads', img));
-    await productsAddService(title, description, basePrice, category, mainImagePath, extraImagesPaths);
+    const extraImagesPaths = extraImagesWebp.map((img: string) =>
+      path.resolve(__dirname, '../../../imagens/uploads', img),
+    );
+
+    await productsAddService(
+      title,
+      description,
+      basePrice,
+      category,
+      attributes,
+      stock,
+      mainImagePath,
+      extraImagesPaths,
+    );
 
     res.status(201).json({ message: 'Product added successfully' });
   } catch (e: any) {
@@ -72,7 +88,7 @@ export const productAttController = async (req: Request, res: Response) => {
     const id = req.params.id;
     if (!id) throw new Error('ID not provided');
 
-    const parsed = productSchema.safeParse(req.body);
+    const parsed = productAttSchema.safeParse(req.body);
     if (!parsed.success) {
       const firstMessage = parsed.error.issues[0]?.message || 'Validation error';
       return res.status(400).json({ error: firstMessage });
@@ -82,10 +98,14 @@ export const productAttController = async (req: Request, res: Response) => {
     const mainImageWebp = req.body.mainImageWebp;
     const extraImagesWebp = req.body.extraImagesWebp || [];
 
-    const mainImagePath = mainImageWebp ? path.resolve(__dirname, '../../../imagens/uploads', mainImageWebp) : undefined;
-    const extraImagesPaths = extraImagesWebp.map((img: string) => path.resolve(__dirname, '../../../imagens/uploads', img));
+    const mainImagePath = mainImageWebp
+      ? path.resolve(__dirname, '../../../imagens/uploads', mainImageWebp)
+      : undefined;
+    const extraImagesPaths = extraImagesWebp.map((img: string) =>
+      path.resolve(__dirname, '../../../imagens/uploads', img),
+    );
 
-    const updatedProduct = await productsAttService(
+    await productsAttService(
       id,
       title,
       description,
@@ -95,10 +115,8 @@ export const productAttController = async (req: Request, res: Response) => {
       extraImagesPaths,
     );
 
-    res.status(200).json({ message: 'The product has been updated', product: updatedProduct });
+    res.status(200).json({ message: 'The product has been updated' });
   } catch (e: any) {
-    console.log("asdasdasdasdsad")
-    console.log(e)
     res.status(400).json({ error: e.message || 'Internal server error' });
   }
 };
@@ -110,7 +128,7 @@ export const productDeleteController = async (req: Request, res: Response) => {
 
     await productsDeleteService(id);
 
-    res.status(204);
+    res.status(204).send();
   } catch (e: any) {
     res.status(400).json({ error: e.message || 'Cannot delete the product' });
   }

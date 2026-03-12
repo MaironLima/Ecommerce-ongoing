@@ -19,6 +19,8 @@ export async function productsAddService(
   description: string,
   basePrice: string,
   category: string,
+  attributes: Record<string, string>,
+  stock: string,
   mainImagePath: string,
   extraImagesPaths: string[],
 ) {
@@ -29,6 +31,13 @@ export async function productsAddService(
         description: description,
         base_price: Number(basePrice),
         main_image: mainImagePath,
+        product_variant: {
+          create: {
+            attributes: attributes,
+            stock: Number(stock),
+            price_override: Number(basePrice),
+          }
+        }
       },
     });
     if (!product) throw new Error('It was not possible to create the product');
@@ -68,12 +77,12 @@ export async function productsAddService(
 
 export async function productsAttService(
   id: string,
-  title: string,
-  description: string,
-  basePrice: string,
-  category: string,
+  title: string | undefined,
+  description: string | undefined,
+  basePrice: string | undefined,
+  category: string | undefined,
   mainImagePath: string | undefined,
-  extraImagesPaths: string[],
+  extraImagesPaths: string[] | undefined,
 ) {
   return prisma.$transaction(async tx => {
     const currentProduct = await tx.product.findUnique({ where: { id } });
@@ -120,18 +129,23 @@ export async function productsAttService(
       if (images.count === 0) throw new Error('Não foi possível atualizar imagens extras');
     }
 
-    return updatedProduct;
   });
 }
 
 export async function productsDeleteService(id: string) {
   return prisma.$transaction(async tx => {
-    await tx.extraImagens.deleteMany({ where: { product_id: id } });
+    // const variants = await tx.productVariant.findMany({ where: { product_id: id } });
+    // const variantIds = variants.map(v => v.id);
 
+    // if (variantIds.length > 0) {
+    //   await tx.cartItem.deleteMany({ where: { variant_id: { in: variantIds } } });
+    //   await tx.inventoryReservation.deleteMany({ where: { variant_id: { in: variantIds } } });
+    // }
+
+    await tx.productVariant.deleteMany({ where: { product_id: id } });
     await tx.productCategory.deleteMany({ where: { product_id: id } });
-
-    // await tx.productVariant.deleteMany({ where: { product_id: id } });
-
+    await tx.extraImagens.deleteMany({ where: { product_id: id } });
+    // await tx.review.deleteMany({ where: { product_id: id } });
     await tx.product.deleteMany({ where: { id } });
   });
 }

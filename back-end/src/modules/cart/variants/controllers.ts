@@ -1,52 +1,70 @@
-// import { Request, Response } from 'express';
+import { Request, Response } from 'express';
+import { variantAddSchema, variantAttSchema } from './dto';
+import { variantAddService, variantAttService, variantGetService } from './services';
 
-// import {
-//   productVariantCreateService,
-//   productVariantGetService,
-//   productVariantUpdateService,
-//   productVariantDeleteService,
-// } from './services';
+export async function variantGetController(req: Request, res: Response) {
+  try {
+    const id = req.params.id;
+    if (!id) throw new Error('ID not provided');
 
-// export async function createProductVariant(req:Request, res:Response) {
-//   try {
-//     const { name } = req.body;
+    const variants = await variantGetService(id);
 
-//     const variant = await productVariantCreateService(productId, data);
+    res.status(201).json({ variants });
+  } catch (e: any) {
+    res.status(400).json({ error: e.message });
+  }
+}
 
-//     res.status(201).json(variant);
-//   } catch (e:any) {
-//     res.status(400).json({ error: e.message });
-//   }
-// }
+export async function variantAddController(req: Request, res: Response) {
+  try {
+    const id = req.params.id;
+    if (!id) throw new Error('ID not provided');
 
-// export async function getProductVariant(req:Request, res:Response) {
-//   try {
-//     const { id } = req.params;
-//     const variant = await productVariantGetService(id);
-//     if (!variant) return res.status(404).json({ error: 'Variant not found' });
-//     res.json(variant);
-//   } catch (e:any) {
-//     res.status(400).json({ error: e.message });
-//   }
-// }
+    const body = Object.fromEntries(Object.entries(req.body));
+    const parsed = variantAddSchema.safeParse(body);
+    if (!parsed.success) {
+      const firstMessage = parsed.error.issues[0]?.message || 'Validation error';
+      return res.status(400).json({ error: firstMessage });
+    }
 
-// export async function updateProductVariant(req:Request, res:Response) {
-//   try {
-//     const { id } = req.params;
-//     const data = req.body;
-//     const variant = await productVariantUpdateService(id, data);
-//     res.json(variant);
-//   } catch (e:any) {
-//     res.status(400).json({ error: e.message });
-//   }
-// }
+    const { stock, priceOverride } = parsed.data;
+    if (!stock) throw new Error('Without stock');
+    if (!priceOverride) throw new Error('Without price override');
 
-// export async function deleteProductVariant(req:Request, res:Response) {
-//   try {
-//     const { id } = req.params;
-//     await productVariantDeleteService(id);
-//     res.status(204).end();
-//   } catch (e:any) {
-//     res.status(400).json({ error: e.message });
-//   }
-// }
+    let attributes = undefined;
+    if (body.attributes) {
+      attributes = typeof body.attributes === 'string' ? JSON.parse(body.attributes) : body.attributes;
+      if (!attributes) throw new Error('Without Attributes');
+    }
+
+    await variantAddService(id, attributes, stock, priceOverride);
+
+    res.status(201).json({ message: 'The variation has been created' });
+  } catch (e: any) {
+    res.status(400).json({ error: e.message });
+  }
+}
+export async function variantAttController(req: Request, res: Response) {
+  try {
+    const variantId = req.params.id;
+    if (!variantId) throw new Error('variant ID not provided');
+    
+    const body = Object.fromEntries(Object.entries(req.body));
+    const parsed = variantAttSchema.safeParse(body);
+    if (!parsed.success) {
+      const firstMessage = parsed.error.issues[0]?.message || 'Validation error';
+      return res.status(400).json({ error: firstMessage });
+    }
+
+    const { stock, priceOverride } = parsed.data;
+    let attributes = undefined;
+    if (body.attributes) {
+      attributes = typeof body.attributes === 'string' ? JSON.parse(body.attributes) : body.attributes;
+    }
+    await variantAttService(variantId, attributes, stock, priceOverride);
+
+    res.status(200).json({ message: 'The variation has been updated' });
+  } catch (e: any) {
+    res.status(400).json({ error: e.message });
+  }
+}

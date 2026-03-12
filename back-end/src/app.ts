@@ -9,7 +9,8 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import userRoutes from './modules/auth/routes.js';
 import productsRoutes from './modules/cart/products/routes.js';
-import productsVariantRoutes from './modules/cart/variants/routes.js';
+import { variantsRoutes } from './modules/cart/variants/routes.js';
+// import productsVariantRoutes from './modules/cart/variants/routes.js';
 
 const app = express();
 
@@ -75,6 +76,7 @@ app.use(
 app.use('/ping', pingRoutes);
 app.use('/auth', userRoutes);
 app.use('/products', productsRoutes); // + review
+app.use('/variants', variantsRoutes);
 // app.use('/cart', cartRoutes);
 // app.use('/checkout', checkoutRoutes);
 // app.use('/orders', ordersRoutes);
