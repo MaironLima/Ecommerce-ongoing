@@ -13,8 +13,8 @@ import requireAdmin from '../../../common/middleware/requireAdmin';
 const productsRoutes: Router = Router();
 
 productsRoutes.get('/', productsController);
-productsRoutes.get('/:id', productsGetController);
 productsRoutes.get('/search', productsSearchController);
+productsRoutes.get('/:id', productsGetController);
 productsRoutes.post('/', uploadMiddleware, productsAddController); // adm
 productsRoutes.put('/:id', uploadMiddlewareNotMandatory, productAttController); // adm
 productsRoutes.delete('/:id', productDeleteController); // adm

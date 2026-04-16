@@ -1,4 +1,7 @@
+import { pool } from '../../../config/db';
 import { prisma } from '../../../libs/prisma';
+
+type SortOption = 'relevance' | 'price_asc' | 'price_desc';
 
 export async function productsService() {
   const results = await prisma.product.findMany();
@@ -12,6 +15,58 @@ export async function productsGetService(id: string) {
   if (!result) throw new Error('Item not found');
 
   return { result };
+}
+
+export async function productsSearchService(
+  query: string,
+  sort: SortOption = 'relevance',
+  limit = 20,
+  offset = 0,
+) {
+  let orderBy = 'rank DESC';
+
+  if (sort === 'price_asc') {
+    orderBy = 'base_price ASC, rank DESC';
+  } else if (sort === 'price_desc') {
+    orderBy = 'base_price DESC, rank DESC';
+  }
+
+  const sql = `
+  SELECT 
+    title,
+    description,
+    base_price,
+    main_image,
+    COALESCE(
+      ts_rank(search_vector, websearch_to_tsquery('english', $1)), 
+      0
+    ) AS rank,
+    GREATEST(
+      similarity(title, $1),
+      word_similarity(title, $1),
+      similarity(description, $1),
+      word_similarity(description, $1)
+    ) AS sim
+  FROM product
+  WHERE 
+    search_vector @@ websearch_to_tsquery('english', $1)
+    OR word_similarity(title, $1) > 0.3
+    OR word_similarity(description, $1) > 0.3
+    OR similarity(description, $1) > 0.3
+  ORDER BY 
+    (search_vector @@ websearch_to_tsquery('english', $1))::int DESC,
+    GREATEST(
+      similarity(title, $1),
+      word_similarity(title, $1),
+      similarity(description, $1),
+      word_similarity(description, $1)
+    ) DESC
+  LIMIT $2 OFFSET $3;
+  `;
+
+  const { rows } = await pool.query(sql, [query, limit, offset]);
+
+  return rows;
 }
 
 export async function productsAddService(
@@ -36,8 +91,8 @@ export async function productsAddService(
             attributes: attributes,
             stock: Number(stock),
             price_override: Number(basePrice),
-          }
-        }
+          },
+        },
       },
     });
     if (!product) throw new Error('It was not possible to create the product');
@@ -69,8 +124,9 @@ export async function productsAddService(
           optimized: true,
         })),
       });
-      if (images.count === 0){
-        throw new Error('It was not possible to sync extra images to the product');}
+      if (images.count === 0) {
+        throw new Error('It was not possible to sync extra images to the product');
+      }
     }
   });
 }
@@ -128,7 +184,6 @@ export async function productsAttService(
       });
       if (images.count === 0) throw new Error('Não foi possível atualizar imagens extras');
     }
-
   });
 }
 

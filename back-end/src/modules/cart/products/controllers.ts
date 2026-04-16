@@ -4,6 +4,7 @@ import {
   productsAttService,
   productsDeleteService,
   productsGetService,
+  productsSearchService,
   productsService,
 } from './services';
 import path from 'path';
@@ -34,8 +35,25 @@ export const productsGetController = async (req: Request, res: Response) => {
 
 export const productsSearchController = async (req: Request, res: Response) => {
   try {
-  } catch (e) {
-    res.status(500).json({ error: 'Internal server error' });
+    const query = String(req.query.q || '');
+    const sort = (req.query.sort as any) || 'relevance';
+    const page = Number(req.query.page || 1);
+
+    if (!query) {
+      throw new Error("Query is mandatory");
+    }
+
+    const result = await productsSearchService(
+      query,
+      sort,
+      20,
+      (page - 1) * 20
+    );
+
+    res.json(result);
+  } catch (e: any) {
+    console.error(e);
+    res.status(400).json({error: e.message ||  'Invalid search' });
   }
 };
 
