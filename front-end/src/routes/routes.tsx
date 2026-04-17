@@ -1,10 +1,11 @@
 import { createBrowserRouter } from "react-router-dom";
-import ErrorPage from "../components/ErrorPage";
 import App from "../App";
-import LoginPage from "@/components/LoginPage";
-import RegisterPage from "@/components/RegisterPage";
-import RecoverPage from "@/components/RecoverPage";
 import Buttons from "@/components/Buttons";
+import ErrorPage from "@/pages/ErrorPage";
+import LoginPage from "@/pages/LoginPage";
+import RegisterPage from "@/pages/RegisterPage";
+import RecoverPage from "@/pages/RecoverPage";
+import MainPage from "@/pages/MainPage";
 
 const router = createBrowserRouter([
   {
@@ -13,9 +14,13 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       {
-        path: "",
+        path: "/m",
         element: <Buttons />,
       },
+      {
+        path: "",
+        element: <MainPage />
+      }
     ],
   },
   {
@@ -39,29 +44,3 @@ const router = createBrowserRouter([
 ]);
 
 export default router;
-
-//   {
-//     path: "/",
-//     element: <App />,
-//     errorElement: <ErrorPage />,
-//     children: [
-//       {
-//       path: "teste",
-//       element: <Teste />
-//       },
-//       {
-//       path: "teste2",
-//       element: <Teste2 />
-//       },
-//       {
-//         path: "/teste2/:id",
-//         element: <TesteId />
-//       },
-//       {
-//         path: "old",
-//         element: <Navigate to="/teste" />
-//       }
-//     ]
-//   },
-
-// ])

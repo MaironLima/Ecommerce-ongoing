@@ -1,16 +1,7 @@
 import { Router } from 'express';
-import {
-  cartAddController,
-  cartAttController,
-  cartController,
-  cartDeleteController,
-} from '../catalog/controllers';
+import { categoryController } from './controllers';
+const catalogRoutes: Router = Router();
 
-const cartRoutes: Router = Router();
+catalogRoutes.get('/category', categoryController);
 
-cartRoutes.get('/', cartController);
-cartRoutes.post('/items', cartAddController);
-cartRoutes.put('/items/:id', cartAttController);
-cartRoutes.delete('/items/:id', cartDeleteController);
-
-export default cartRoutes;
+export default catalogRoutes;

@@ -14,7 +14,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { CardAction } from "./ui/corrections";
+import { CardAction } from "../components/ui/corrections";
 import { AlertCircleIcon } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import publicAPI from "@/services/api/publicApi";

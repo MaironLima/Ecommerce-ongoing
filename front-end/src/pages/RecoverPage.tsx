@@ -10,8 +10,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { Field, FieldDescription, FieldGroup, FieldLabel } from "./ui/field";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
+import { Field, FieldDescription, FieldGroup, FieldLabel } from "../components/ui/field";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "../components/ui/input-otp";
 import { useNavigate } from "react-router-dom";
 import { AlertCircleIcon, CheckCircle2Icon } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
