@@ -23,45 +23,46 @@ export async function productsSearchService(
   limit = 20,
   offset = 0,
 ) {
-  let orderBy = 'rank DESC';
-
+  let orderBy = '';
   if (sort === 'price_asc') {
-    orderBy = 'base_price ASC, rank DESC';
+    orderBy = ', base_price ASC';
   } else if (sort === 'price_desc') {
-    orderBy = 'base_price DESC, rank DESC';
+    orderBy = ', base_price DESC';
+  } else {
+    orderBy = '';
   }
 
   const sql = `
-  SELECT 
-    title,
-    description,
-    base_price,
-    main_image,
-    COALESCE(
-      ts_rank(search_vector, websearch_to_tsquery('english', $1)), 
-      0
-    ) AS rank,
-    GREATEST(
-      similarity(title, $1),
-      word_similarity(title, $1),
-      similarity(description, $1),
-      word_similarity(description, $1)
-    ) AS sim
-  FROM product
-  WHERE 
-    search_vector @@ websearch_to_tsquery('english', $1)
-    OR word_similarity(title, $1) > 0.3
-    OR word_similarity(description, $1) > 0.3
-    OR similarity(description, $1) > 0.3
-  ORDER BY 
-    (search_vector @@ websearch_to_tsquery('english', $1))::int DESC,
-    GREATEST(
-      similarity(title, $1),
-      word_similarity(title, $1),
-      similarity(description, $1),
-      word_similarity(description, $1)
-    ) DESC
-  LIMIT $2 OFFSET $3;
+    SELECT 
+      title,
+      description,
+      base_price,
+      main_image,
+      COALESCE(
+        ts_rank(search_vector, websearch_to_tsquery('english', $1)), 
+        0
+      ) AS rank,
+      GREATEST(
+        similarity(title, $1),
+        word_similarity(title, $1),
+        similarity(description, $1),
+        word_similarity(description, $1)
+      ) AS sim
+    FROM product
+    WHERE 
+      search_vector @@ websearch_to_tsquery('english', $1)
+      OR word_similarity(title, $1) > 0.3
+      OR word_similarity(description, $1) > 0.3
+      OR similarity(description, $1) > 0.3
+    ORDER BY 
+      (search_vector @@ websearch_to_tsquery('english', $1))::int DESC,
+      GREATEST(
+        similarity(title, $1),
+        word_similarity(title, $1),
+        similarity(description, $1),
+        word_similarity(description, $1)
+      ) DESC${orderBy}
+    LIMIT $2 OFFSET $3;
   `;
 
   const { rows } = await pool.query(sql, [query, limit, offset]);
