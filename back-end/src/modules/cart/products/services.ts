@@ -1,46 +1,78 @@
 import { pool } from '../../../config/db';
 import { prisma } from '../../../libs/prisma';
 
-export type SortOption = 'relevance' | 'price_asc' | 'price_desc';
+export type SortOption = 'most recent' | 'ascending price' | 'descending price';
 
-export async function productsService(sort: SortOption = 'relevance', limit = 20, offset = 0) {
+export async function productsService(
+  sort: string = 'most recent', 
+  limit = 20,
+  offset = 0,
+  category: string = 'all',
+) {
+  const formatedSort = sort.toLowerCase().trim();
+  const formatedCategory = category.toLowerCase().trim();
+
   let orderBy: string;
-  if (sort === 'price_asc') {
-    orderBy = 'base_price ASC';
-  } else if (sort === 'price_desc') {
-    orderBy = 'base_price DESC';
+  
+  if (formatedSort === 'ascending price') {
+    orderBy = 'p.base_price ASC';
+  } else if (formatedSort === 'descending price') {
+    orderBy = 'p.base_price DESC';
   } else {
-    orderBy = 'created_at DESC';
+    orderBy = 'p.created_at DESC'; 
   }
 
-  const sql = `
-    SELECT 
-    id,
-    title,
-    description,
-    base_price,
-    main_image,
-    created_at
-    FROM product
-    ORDER BY ${orderBy}
-    LIMIT $1 OFFSET $2;
-  `;
+  let sql: string;
 
-  const { rows } = await pool.query(sql, [limit, offset]);
+  if (formatedCategory === 'all') {
+    sql = `
+      SELECT
+        p.id,
+        p.title,
+        p.description,
+        p.base_price,
+        p.main_image,
+        p.created_at
+      FROM product p
+      ORDER BY ${orderBy}
+      LIMIT $1 OFFSET $2;
+    `;
+    
+    const { rows } = await pool.query(sql, [limit, offset]);
+    return { rows };
 
-  return { rows };
+  } else {
+    sql = `
+      SELECT
+        p.id,
+        p.title,
+        p.description,
+        p.base_price,
+        p.main_image,
+        p.created_at
+      FROM product p
+      JOIN product_category pc ON pc.product_id = p.id
+      JOIN category c ON c.id = pc.category_id
+      WHERE LOWER(c.name) = $1
+      ORDER BY ${orderBy}
+      LIMIT $2 OFFSET $3;
+    `;
+
+    const { rows } = await pool.query(sql, [formatedCategory, limit, offset]);
+    return { rows };
+  }
 }
 
 export async function productsSearchService(
   query: string,
-  sort: SortOption = 'relevance',
+  sort: SortOption = 'most recent',
   limit = 20,
   offset = 0,
 ) {
   let orderBy = '';
-  if (sort === 'price_asc') {
+  if (sort === 'ascending price') {
     orderBy = ', base_price ASC';
-  } else if (sort === 'price_desc') {
+  } else if (sort === 'descending price') {
     orderBy = ', base_price DESC';
   } else {
     orderBy = '';
@@ -211,18 +243,31 @@ export async function productsAttService(
 
 export async function productsDeleteService(id: string) {
   return prisma.$transaction(async tx => {
-    // const variants = await tx.productVariant.findMany({ where: { product_id: id } });
-    // const variantIds = variants.map(v => v.id);
+    const variants = await tx.productVariant.findMany({ where: { product_id: id } });
+    const variantIds = variants.map(v => v.id);
 
-    // if (variantIds.length > 0) {
-    //   await tx.cartItem.deleteMany({ where: { variant_id: { in: variantIds } } });
-    //   await tx.inventoryReservation.deleteMany({ where: { variant_id: { in: variantIds } } });
-    // }
+    if (variantIds.length > 0) {
+      await tx.cartItem.deleteMany({ where: { variant_id: { in: variantIds } } });
+      await tx.inventoryReservation.deleteMany({ where: { variant_id: { in: variantIds } } });
+    }
 
+    await tx.review.deleteMany({ where: { product_id: id } });
     await tx.productVariant.deleteMany({ where: { product_id: id } });
     await tx.productCategory.deleteMany({ where: { product_id: id } });
     await tx.extraImagens.deleteMany({ where: { product_id: id } });
-    // await tx.review.deleteMany({ where: { product_id: id } });
     await tx.product.deleteMany({ where: { id } });
   });
+}
+
+export async function productsDeleteAllService() {
+  try {
+    const products = await prisma.product.findMany({ select: { id: true } });
+    
+    for (const product of products) {
+      await productsDeleteService(product.id);
+    }
+  } catch (error) {
+    console.error('Delete all products error:', error);
+    throw error;
+  }
 }

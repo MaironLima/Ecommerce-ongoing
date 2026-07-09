@@ -9,61 +9,67 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-} from "@/components/ui/sidebar"
-import publicAPI from "@/services/api/publicApi"
-import { useQuery } from "@tanstack/react-query"
-import { useState, useEffect } from "react";
+} from "@/components/ui/sidebar";
+import publicAPI from "@/services/api/publicApi";
+import { useStore } from "@/stores/store";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 
 const defaultOrderBy = [
-  { title: "Relevance", url: "#" },
+  { title: "Most Recent", url: "#" },
   { title: "Ascending price", url: "#" },
   { title: "Descending price", url: "#" },
-]
+];
+
+const defaultCategory = { title: "All", url: "#" };
 
 interface CategoryItem {
-  title: string
-  url: string
+  title: string;
+  url: string;
 }
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
-  onOrderByChange?: (title: string) => void
-  onCategoryChange?: (title: string) => void
+  onOrderByChange?: (title: string) => void;
+  onCategoryChange?: (title: string) => void;
 }
 
-export function AppSidebar({ onOrderByChange, onCategoryChange, ...props }: AppSidebarProps) {
-  const [activeOrderBy, setActiveOrderBy] = useState("Relevance")
-  const [activeCategory, setActiveCategory] = useState<string | null>(null)
+export function AppSidebar({
+  onOrderByChange,
+  onCategoryChange,
+  ...props
+}: AppSidebarProps) {
+  const [activeOrderBy, setActiveOrderBy] = useState("Most Recent");
+  const [activeCategory, setActiveCategory] = useState<string | null>("All");
+  const { setCategory, setOrderBy } = useStore();
 
   const handleOrderByClick = (title: string) => {
-    setActiveOrderBy(title)
-    onOrderByChange?.(title)
-  }
+    setActiveOrderBy(title);
+    onOrderByChange?.(title);
+    setOrderBy(title);
+  };
 
   const handleCategoryClick = (title: string) => {
-    setActiveCategory(title)
-    onCategoryChange?.(title)
-  }
+    setActiveCategory(title);
+    onCategoryChange?.(title);
+    setCategory(title);
+  };
 
   const { data: categories = [] } = useQuery<CategoryItem[]>({
     queryKey: ["categories"],
     queryFn: async () => {
-      const response = await publicAPI.get("/catalog/category")
+      const response = await publicAPI.get("/catalog/category");
       const results: { id: string; name: string }[] =
-        response.data?.results ?? []
+        response.data?.results ?? setActiveCategory(defaultCategory.title);
+      onCategoryChange?.(defaultCategory.title);
+      setCategory(defaultCategory.title);
       return results.map((cat) => ({
         title: cat.name,
         url: "#",
-      }))
+      }));
     },
-  })
+  });
 
-  useEffect(() => {
-    if (categories.length > 0 && activeCategory === null) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setActiveCategory(categories[0].title)
-      onCategoryChange?.(categories[0].title)
-    }
-  }, [categories])
+  const displayCategories = [defaultCategory, ...categories];
 
   return (
     <Sidebar collapsible="none" {...props}>
@@ -76,6 +82,7 @@ export function AppSidebar({ onOrderByChange, onCategoryChange, ...props }: AppS
               {defaultOrderBy.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
+                    className="capitalize"
                     asChild
                     isActive={activeOrderBy === item.title}
                     onClick={() => handleOrderByClick(item.title)}
@@ -94,9 +101,10 @@ export function AppSidebar({ onOrderByChange, onCategoryChange, ...props }: AppS
           <SidebarGroupLabel>Categorys</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {categories.map((item: CategoryItem) => (
+              {displayCategories.map((item: CategoryItem) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
+                    className="capitalize"
                     asChild
                     isActive={activeCategory === item.title}
                     onClick={() => handleCategoryClick(item.title)}
@@ -113,5 +121,5 @@ export function AppSidebar({ onOrderByChange, onCategoryChange, ...props }: AppS
       </SidebarContent>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }

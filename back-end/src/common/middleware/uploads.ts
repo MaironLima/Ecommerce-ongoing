@@ -2,6 +2,13 @@ import upload from "../../config/multer";
 import { Request, Response, NextFunction } from "express";
 import sharp from "sharp";
 import path from "path";
+import fs from "fs";
+
+// Garante de forma segura que a pasta de uploads exista em qualquer ambiente (Windows/Linux)
+const UPLOAD_DIR = path.resolve(process.cwd(), 'imagens', 'uploads');
+if (!fs.existsSync(UPLOAD_DIR)) {
+  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+}
 
 const uploadMaxCountMiddleware = upload.fields([
   { name: "mainImage", maxCount: 1 },
@@ -15,44 +22,57 @@ function validateMainImageMinCount(req: Request, res: Response, next: NextFuncti
   next();
 }
 
-
 async function processImagesWithSharp(req: Request, res: Response, next: NextFunction) {
   try {
-    // mainImage
+    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+
+    // 1. Processamento da mainImage
     if (req.files && !Array.isArray(req.files) && req.files.mainImage && req.files.mainImage[0]) {
-        const imageBuffer = (req.files.mainImage[0] as Express.Multer.File).buffer;
+      const imageBuffer = (req.files.mainImage[0] as Express.Multer.File).buffer;
       const originalName = req.files.mainImage[0].originalname;
-      const webpName = path.parse(originalName).name + ".webp";
-      const uploadPath = path.resolve(__dirname, "../../imagens/uploads", webpName);
+      const sanitizedName = path.parse(originalName).name.replace(/\s+/g, "-");
+      
+      // Nome salvo no banco de dados (Apenas o arquivo, ex: "171234567-foto.webp")
+      const webpName = `${uniqueSuffix}-${sanitizedName}.webp`;
+      const uploadPath = path.join(UPLOAD_DIR, webpName);
+
       await sharp(imageBuffer)
-        .resize(800, 800)
-        .webp()
+        .resize(800, 800, { fit: "cover" }) // Opcional: Garante proporções perfeitas 800x800
+        .webp({ quality: 80 }) // Opcional: Controla a qualidade/compressão do WebP
         .toFile(uploadPath);
+
+      // Injeta apenas o nome do arquivo para o seu Controller salvar no banco
       req.body.mainImageWebp = webpName;
     }
 
-    // extraImages
+    // 2. Processamento das extraImages
     if (req.files && !Array.isArray(req.files) && req.files.extraImages && Array.isArray(req.files.extraImages)) {
       req.body.extraImagesWebp = [];
-      for (const file of req.files.extraImages as Express.Multer.File[]) {
+
+      for (const [index, file] of (req.files.extraImages as Express.Multer.File[]).entries()) {
         const extraBuffer = file.buffer;
         const originalName = file.originalname;
-        const webpName = path.parse(originalName).name + ".webp";
-        const extraUploadPath = path.resolve(__dirname, "../../imagens/uploads", webpName);
+        const sanitizedName = path.parse(originalName).name.replace(/\s+/g, "-");
+
+        // Adiciona o index no sufixo para evitar colisões entre as imagens extras do mesmo lote
+        const webpName = `${uniqueSuffix}-${index}-${sanitizedName}.webp`;
+        const extraUploadPath = path.join(UPLOAD_DIR, webpName);
+
         await sharp(extraBuffer)
-          .resize(800, 800)
-          .webp()
+          .resize(800, 800, { fit: "cover" })
+          .webp({ quality: 80 })
           .toFile(extraUploadPath);
+
         req.body.extraImagesWebp.push(webpName);
       }
     }
 
     next();
-  } catch (error) {
+  } catch (error: any) {
+    console.error("Sharp Processing Error:", error);
     return res.status(500).json({ error: "Error processing image" });
   }
 }
-
 
 const uploadMiddleware = [
   uploadMaxCountMiddleware,

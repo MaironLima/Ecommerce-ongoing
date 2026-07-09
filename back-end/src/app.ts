@@ -11,14 +11,17 @@ import userRoutes from './modules/auth/routes.js';
 import productsRoutes from './modules/cart/products/routes.js';
 import { variantsRoutes } from './modules/cart/variants/routes.js';
 import catalogRoutes from './modules/catalog/routes.js';
-// import productsVariantRoutes from './modules/cart/variants/routes.js';
+import path from 'path';
+import fs from 'fs';
 
 const app = express();
 
-app.use(cors({
-  origin: "http://localhost:5173",
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+  }),
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -37,29 +40,54 @@ app.use(
     noSniff: true,
     referrerPolicy: { policy: 'no-referrer' },
     xssFilter: true,
+    // CORREÇÃO AQUI: Diz para o Helmet liberar recursos cross-origin (como imagens)
+    crossOriginResourcePolicy: { policy: 'cross-origin' }, 
   }),
 );
 
+app.get('/uploads', (req, res) => {
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5173');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
 
+  const fileSource = req.query.path as string;
 
+  if (!fileSource) {
+    return res.status(400).json({ error: 'Parameter "path" is required' });
+  }
 
+  // 1. Pega apenas o nome do arquivo (ex: "blue.webp")
+  const fileName = path.basename(decodeURIComponent(fileSource));
+
+  // 2. Monta o caminho apontando corretamente para dentro de "back-end/imagens/uploads"
+  const absolutePath = path.resolve(process.cwd(), 'imagens', 'uploads', fileName);
+
+  // 3. Verifica se o arquivo existe na pasta física real
+  if (!fs.existsSync(absolutePath)) {
+    console.error(`[ERRO NO DISCO] Não achou em: ${absolutePath}`);
+    return res.status(404).json({ error: 'File not found' });
+  }
+
+  // 4. Envia o arquivo para o Frontend
+  res.sendFile(absolutePath);
+});
 
 app.use(
-  "/auth/login",
+  '/auth/login',
   rateLimit({
     windowMs: 60 * 1000,
     max: 5,
-    message: "Too many requests. Wait a minute.",
-  })
+    message: 'Too many requests. Wait a minute.',
+  }),
 );
 
 app.use(
-  "/auth/register",
+  '/auth/register',
   rateLimit({
     windowMs: 60 * 1000,
     max: 5,
-    message: "Too many requests. Wait a minute.",
-  })
+    message: 'Too many requests. Wait a minute.',
+  }),
 );
 
 app.use(
@@ -76,13 +104,9 @@ app.use(
 
 app.use('/ping', pingRoutes);
 app.use('/auth', userRoutes);
-app.use('/products', productsRoutes); // + review
+app.use('/products', productsRoutes); 
 app.use('/variants', variantsRoutes);
 app.use('/catalog', catalogRoutes);
-// app.use('/cart', cartRoutes);
-// app.use('/checkout', checkoutRoutes);
-// app.use('/orders', ordersRoutes);
-// app.use('/admin', requireRole(["ADMIN"]), adminRoutes);
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);

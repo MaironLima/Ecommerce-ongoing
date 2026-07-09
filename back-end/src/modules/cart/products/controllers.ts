@@ -2,22 +2,23 @@ import { Request, Response } from 'express';
 import {
   productsAddService,
   productsAttService,
+  productsDeleteAllService,
   productsDeleteService,
   productsGetService,
   productsSearchService,
   productsService,
   SortOption,
 } from './services';
-import path from 'path';
 import { productSchema, productAttSchema } from './dto';
 
 export const productsController = async (req: Request, res: Response) => {
   try {
     const sort = (req.query.sort as SortOption) || 'relevance';
     const pageRaw = Number(req.query.page);
+    const category = String(req.query.category) || 'all';
     const page = !pageRaw || isNaN(pageRaw) || pageRaw < 1 ? 1 : pageRaw;
 
-    const { rows } = await productsService(sort, 20, (page - 1) * 20);
+    const { rows } = await productsService(sort, 20, (page - 1) * 20, category);
 
     res.status(200).json({ results: rows });
   } catch (e: any) {
@@ -67,18 +68,16 @@ export const productsAddController = async (req: Request, res: Response) => {
     if (!category) throw new Error('Without category');
     if (!stock) throw new Error('Without stock');
 
-    const attributes = JSON.parse(req.body.attributes);
+    const attributes = typeof req.body.attributes === 'string' 
+      ? JSON.parse(req.body.attributes) 
+      : req.body.attributes;
+      
     if (!attributes) throw new Error('Without Attributes');
 
-    const mainImageWebp = req.body.mainImageWebp;
-    const extraImagesWebp = req.body.extraImagesWebp || [];
+    const mainImageWebp = req.body.mainImageWebp; 
+    const extraImagesWebp = req.body.extraImagesWebp || []; 
 
     if (!mainImageWebp) throw new Error('Without main image');
-
-    const mainImagePath = path.resolve(__dirname, '../../../imagens/uploads', mainImageWebp);
-    const extraImagesPaths = extraImagesWebp.map((img: string) =>
-      path.resolve(__dirname, '../../../imagens/uploads', img),
-    );
 
     await productsAddService(
       title,
@@ -87,8 +86,8 @@ export const productsAddController = async (req: Request, res: Response) => {
       category,
       attributes,
       stock,
-      mainImagePath,
-      extraImagesPaths,
+      mainImageWebp,     
+      extraImagesWebp,    
     );
 
     res.status(201).json({ message: 'Product added successfully' });
@@ -112,12 +111,8 @@ export const productAttController = async (req: Request, res: Response) => {
     const mainImageWebp = req.body.mainImageWebp;
     const extraImagesWebp = req.body.extraImagesWebp || [];
 
-    const mainImagePath = mainImageWebp
-      ? path.resolve(__dirname, '../../../imagens/uploads', mainImageWebp)
-      : undefined;
-    const extraImagesPaths = extraImagesWebp.map((img: string) =>
-      path.resolve(__dirname, '../../../imagens/uploads', img),
-    );
+    const mainImagePath = mainImageWebp || undefined;
+    const extraImagesPaths = extraImagesWebp.length > 0 ? extraImagesWebp : undefined;
 
     await productsAttService(
       id,
@@ -141,6 +136,17 @@ export const productDeleteController = async (req: Request, res: Response) => {
     if (!id) throw new Error('ID not provided');
 
     await productsDeleteService(id);
+
+    res.status(204).send();
+  } catch (e: any) {
+    res.status(400).json({ error: e.message || 'Cannot delete the product' });
+  }
+};
+
+export const productDeleteAllController = async (req: Request, res: Response) => {
+  try {
+
+    await productsDeleteAllService();
 
     res.status(204).send();
   } catch (e: any) {

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
   productAttController,
+  productDeleteAllController,
   productDeleteController,
   productsAddController,
   productsController,
@@ -17,6 +18,7 @@ productsRoutes.get('/search', productsSearchController);
 productsRoutes.get('/:id', productsGetController);
 productsRoutes.post('/', uploadMiddleware, productsAddController); // adm
 productsRoutes.put('/:id', uploadMiddlewareNotMandatory, productAttController); // adm
+productsRoutes.delete('/all', productDeleteAllController); // adm
 productsRoutes.delete('/:id', productDeleteController); // adm
 
 
