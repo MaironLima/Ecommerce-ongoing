@@ -1,5 +1,3 @@
-import * as React from "react"
-
 import {
   Sidebar,
   SidebarContent,
@@ -14,7 +12,7 @@ import {
 } from "@/components/ui/sidebar"
 import publicAPI from "@/services/api/publicApi"
 import { useQuery } from "@tanstack/react-query"
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const defaultOrderBy = [
   { title: "Relevance", url: "#" },
@@ -59,9 +57,9 @@ export function AppSidebar({ onOrderByChange, onCategoryChange, ...props }: AppS
     },
   })
 
-  // substitui o onSuccess removido no React Query v5
-  React.useEffect(() => {
+  useEffect(() => {
     if (categories.length > 0 && activeCategory === null) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setActiveCategory(categories[0].title)
       onCategoryChange?.(categories[0].title)
     }

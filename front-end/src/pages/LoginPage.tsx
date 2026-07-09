@@ -105,15 +105,7 @@ export function LoginPage() {
       </div>
 
       <div
-        style={{
-          position: "fixed",
-          top: 32,
-          left: "50%",
-          transform: "translateX(-50%)",
-          zIndex: 50,
-          minWidth: 350,
-          maxWidth: "90vw",
-        }}
+        className="fixed top-8 left-1/2 -translate-x-1/2 z-50 min-w-[350px] max-w-[90vw] w-fit"
       >
         {mes && isLoginError && (
           <Alert variant="destructive">

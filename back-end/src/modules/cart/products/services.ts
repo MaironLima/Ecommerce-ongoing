@@ -1,20 +1,34 @@
 import { pool } from '../../../config/db';
 import { prisma } from '../../../libs/prisma';
 
-type SortOption = 'relevance' | 'price_asc' | 'price_desc';
+export type SortOption = 'relevance' | 'price_asc' | 'price_desc';
 
-export async function productsService() {
-  const results = await prisma.product.findMany();
-  if (!results) throw new Error("Can't find the products");
+export async function productsService(sort: SortOption = 'relevance', limit = 20, offset = 0) {
+  let orderBy: string;
+  if (sort === 'price_asc') {
+    orderBy = 'base_price ASC';
+  } else if (sort === 'price_desc') {
+    orderBy = 'base_price DESC';
+  } else {
+    orderBy = 'created_at DESC';
+  }
 
-  return { results };
-}
+  const sql = `
+    SELECT 
+    id,
+    title,
+    description,
+    base_price,
+    main_image,
+    created_at
+    FROM product
+    ORDER BY ${orderBy}
+    LIMIT $1 OFFSET $2;
+  `;
 
-export async function productsGetService(id: string) {
-  const result = await prisma.product.findUnique({ where: { id } });
-  if (!result) throw new Error('Item not found');
+  const { rows } = await pool.query(sql, [limit, offset]);
 
-  return { result };
+  return { rows };
 }
 
 export async function productsSearchService(
@@ -68,6 +82,13 @@ export async function productsSearchService(
   const { rows } = await pool.query(sql, [query, limit, offset]);
 
   return rows;
+}
+
+export async function productsGetService(id: string) {
+  const result = await prisma.product.findUnique({ where: { id } });
+  if (!result) throw new Error("Can't find the product");
+
+  return { result };
 }
 
 export async function productsAddService(

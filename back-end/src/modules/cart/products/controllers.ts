@@ -6,17 +6,22 @@ import {
   productsGetService,
   productsSearchService,
   productsService,
+  SortOption,
 } from './services';
 import path from 'path';
 import { productSchema, productAttSchema } from './dto';
 
 export const productsController = async (req: Request, res: Response) => {
   try {
-    const { results } = await productsService();
+    const sort = (req.query.sort as SortOption) || 'relevance';
+    const pageRaw = Number(req.query.page);
+    const page = !pageRaw || isNaN(pageRaw) || pageRaw < 1 ? 1 : pageRaw;
 
-    res.status(200).json({ results });
+    const { rows } = await productsService(sort, 20, (page - 1) * 20);
+
+    res.status(200).json({ results: rows });
   } catch (e: any) {
-    res.status(400).json({ error: e.message || 'It was not possible to return the products' });
+    res.status(400).json({ error: e.message || 'Error listing products' });
   }
 };
 
@@ -39,21 +44,12 @@ export const productsSearchController = async (req: Request, res: Response) => {
     const sort = (req.query.sort as any) || 'relevance';
     const page = Number(req.query.page || 1);
 
-    if (!query) {
-      throw new Error("Query is mandatory");
-    }
-
-    const result = await productsSearchService(
-      query,
-      sort,
-      20,
-      (page - 1) * 20
-    );
+    const result = await productsSearchService(query, sort, 20, (page - 1) * 20);
 
     res.json(result);
   } catch (e: any) {
     console.error(e);
-    res.status(400).json({error: e.message ||  'Invalid search' });
+    res.status(400).json({ error: e.message || 'Invalid search' });
   }
 };
 
@@ -73,7 +69,7 @@ export const productsAddController = async (req: Request, res: Response) => {
 
     const attributes = JSON.parse(req.body.attributes);
     if (!attributes) throw new Error('Without Attributes');
-    
+
     const mainImageWebp = req.body.mainImageWebp;
     const extraImagesWebp = req.body.extraImagesWebp || [];
 

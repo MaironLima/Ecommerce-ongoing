@@ -144,7 +144,7 @@ export type ProductCategoryGroupByOutputType = {
   _max: ProductCategoryMaxAggregateOutputType | null
 }
 
-type GetProductCategoryGroupByPayload<T extends ProductCategoryGroupByArgs> = Prisma.PrismaPromise<
+export type GetProductCategoryGroupByPayload<T extends ProductCategoryGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ProductCategoryGroupByOutputType, T['by']> &
       {
@@ -166,16 +166,16 @@ export type ProductCategoryWhereInput = {
   id?: Prisma.StringFilter<"ProductCategory"> | string
   product_id?: Prisma.StringFilter<"ProductCategory"> | string
   category_id?: Prisma.StringFilter<"ProductCategory"> | string
-  product_sync?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
   category_sync?: Prisma.XOR<Prisma.CategoryScalarRelationFilter, Prisma.CategoryWhereInput>
+  product_sync?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
 }
 
 export type ProductCategoryOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   product_id?: Prisma.SortOrder
   category_id?: Prisma.SortOrder
-  product_sync?: Prisma.ProductOrderByWithRelationInput
   category_sync?: Prisma.CategoryOrderByWithRelationInput
+  product_sync?: Prisma.ProductOrderByWithRelationInput
 }
 
 export type ProductCategoryWhereUniqueInput = Prisma.AtLeast<{
@@ -185,8 +185,8 @@ export type ProductCategoryWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.ProductCategoryWhereInput | Prisma.ProductCategoryWhereInput[]
   product_id?: Prisma.StringFilter<"ProductCategory"> | string
   category_id?: Prisma.StringFilter<"ProductCategory"> | string
-  product_sync?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
   category_sync?: Prisma.XOR<Prisma.CategoryScalarRelationFilter, Prisma.CategoryWhereInput>
+  product_sync?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
 }, "id">
 
 export type ProductCategoryOrderByWithAggregationInput = {
@@ -209,8 +209,8 @@ export type ProductCategoryScalarWhereWithAggregatesInput = {
 
 export type ProductCategoryCreateInput = {
   id?: string
-  product_sync: Prisma.ProductCreateNestedOneWithoutProduct_caregoryInput
   category_sync: Prisma.CategoryCreateNestedOneWithoutProduct_categoryInput
+  product_sync: Prisma.ProductCreateNestedOneWithoutProduct_caregoryInput
 }
 
 export type ProductCategoryUncheckedCreateInput = {
@@ -221,8 +221,8 @@ export type ProductCategoryUncheckedCreateInput = {
 
 export type ProductCategoryUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  product_sync?: Prisma.ProductUpdateOneRequiredWithoutProduct_caregoryNestedInput
   category_sync?: Prisma.CategoryUpdateOneRequiredWithoutProduct_categoryNestedInput
+  product_sync?: Prisma.ProductUpdateOneRequiredWithoutProduct_caregoryNestedInput
 }
 
 export type ProductCategoryUncheckedUpdateInput = {
@@ -486,24 +486,24 @@ export type ProductCategorySelect<ExtArgs extends runtime.Types.Extensions.Inter
   id?: boolean
   product_id?: boolean
   category_id?: boolean
-  product_sync?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
   category_sync?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
+  product_sync?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["productCategory"]>
 
 export type ProductCategorySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   product_id?: boolean
   category_id?: boolean
-  product_sync?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
   category_sync?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
+  product_sync?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["productCategory"]>
 
 export type ProductCategorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   product_id?: boolean
   category_id?: boolean
-  product_sync?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
   category_sync?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
+  product_sync?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["productCategory"]>
 
 export type ProductCategorySelectScalar = {
@@ -514,23 +514,23 @@ export type ProductCategorySelectScalar = {
 
 export type ProductCategoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "product_id" | "category_id", ExtArgs["result"]["productCategory"]>
 export type ProductCategoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  product_sync?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
   category_sync?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
+  product_sync?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
 }
 export type ProductCategoryIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  product_sync?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
   category_sync?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
+  product_sync?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
 }
 export type ProductCategoryIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  product_sync?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
   category_sync?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
+  product_sync?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
 }
 
 export type $ProductCategoryPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ProductCategory"
   objects: {
-    product_sync: Prisma.$ProductPayload<ExtArgs>
     category_sync: Prisma.$CategoryPayload<ExtArgs>
+    product_sync: Prisma.$ProductPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -930,8 +930,8 @@ readonly fields: ProductCategoryFieldRefs;
  */
 export interface Prisma__ProductCategoryClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  product_sync<T extends Prisma.ProductDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProductDefaultArgs<ExtArgs>>): Prisma.Prisma__ProductClient<runtime.Types.Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   category_sync<T extends Prisma.CategoryDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CategoryDefaultArgs<ExtArgs>>): Prisma.Prisma__CategoryClient<runtime.Types.Result.GetResult<Prisma.$CategoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  product_sync<T extends Prisma.ProductDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProductDefaultArgs<ExtArgs>>): Prisma.Prisma__ProductClient<runtime.Types.Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1160,6 +1160,11 @@ export type ProductCategoryFindManyArgs<ExtArgs extends runtime.Types.Extensions
    * Skip the first `n` ProductCategories.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of ProductCategories.
+   */
   distinct?: Prisma.ProductCategoryScalarFieldEnum | Prisma.ProductCategoryScalarFieldEnum[]
 }
 

@@ -199,7 +199,7 @@ export type ExtraImagensGroupByOutputType = {
   _max: ExtraImagensMaxAggregateOutputType | null
 }
 
-type GetExtraImagensGroupByPayload<T extends ExtraImagensGroupByArgs> = Prisma.PrismaPromise<
+export type GetExtraImagensGroupByPayload<T extends ExtraImagensGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ExtraImagensGroupByOutputType, T['by']> &
       {
@@ -1222,6 +1222,11 @@ export type ExtraImagensFindManyArgs<ExtArgs extends runtime.Types.Extensions.In
    * Skip the first `n` ExtraImagens.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of ExtraImagens.
+   */
   distinct?: Prisma.ExtraImagensScalarFieldEnum | Prisma.ExtraImagensScalarFieldEnum[]
 }
 

@@ -27,69 +27,81 @@ export type AggregateProductVariant = {
 }
 
 export type ProductVariantAvgAggregateOutputType = {
-  stock: number | null
   price_override: runtime.Decimal | null
+  stock: number | null
 }
 
 export type ProductVariantSumAggregateOutputType = {
-  stock: number | null
   price_override: runtime.Decimal | null
+  stock: number | null
 }
 
 export type ProductVariantMinAggregateOutputType = {
   id: string | null
   product_id: string | null
-  stock: number | null
   price_override: runtime.Decimal | null
+  stock: number | null
+  created_at: Date | null
+  updated_at: Date | null
 }
 
 export type ProductVariantMaxAggregateOutputType = {
   id: string | null
   product_id: string | null
-  stock: number | null
   price_override: runtime.Decimal | null
+  stock: number | null
+  created_at: Date | null
+  updated_at: Date | null
 }
 
 export type ProductVariantCountAggregateOutputType = {
   id: number
   product_id: number
   attributes: number
-  stock: number
   price_override: number
+  stock: number
+  created_at: number
+  updated_at: number
   _all: number
 }
 
 
 export type ProductVariantAvgAggregateInputType = {
-  stock?: true
   price_override?: true
+  stock?: true
 }
 
 export type ProductVariantSumAggregateInputType = {
-  stock?: true
   price_override?: true
+  stock?: true
 }
 
 export type ProductVariantMinAggregateInputType = {
   id?: true
   product_id?: true
-  stock?: true
   price_override?: true
+  stock?: true
+  created_at?: true
+  updated_at?: true
 }
 
 export type ProductVariantMaxAggregateInputType = {
   id?: true
   product_id?: true
-  stock?: true
   price_override?: true
+  stock?: true
+  created_at?: true
+  updated_at?: true
 }
 
 export type ProductVariantCountAggregateInputType = {
   id?: true
   product_id?: true
   attributes?: true
-  stock?: true
   price_override?: true
+  stock?: true
+  created_at?: true
+  updated_at?: true
   _all?: true
 }
 
@@ -183,8 +195,10 @@ export type ProductVariantGroupByOutputType = {
   id: string
   product_id: string
   attributes: runtime.JsonValue
-  stock: number
   price_override: runtime.Decimal | null
+  stock: number
+  created_at: Date
+  updated_at: Date
   _count: ProductVariantCountAggregateOutputType | null
   _avg: ProductVariantAvgAggregateOutputType | null
   _sum: ProductVariantSumAggregateOutputType | null
@@ -192,7 +206,7 @@ export type ProductVariantGroupByOutputType = {
   _max: ProductVariantMaxAggregateOutputType | null
 }
 
-type GetProductVariantGroupByPayload<T extends ProductVariantGroupByArgs> = Prisma.PrismaPromise<
+export type GetProductVariantGroupByPayload<T extends ProductVariantGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ProductVariantGroupByOutputType, T['by']> &
       {
@@ -214,8 +228,10 @@ export type ProductVariantWhereInput = {
   id?: Prisma.StringFilter<"ProductVariant"> | string
   product_id?: Prisma.StringFilter<"ProductVariant"> | string
   attributes?: Prisma.JsonFilter<"ProductVariant">
-  stock?: Prisma.IntFilter<"ProductVariant"> | number
   price_override?: Prisma.DecimalNullableFilter<"ProductVariant"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  stock?: Prisma.IntFilter<"ProductVariant"> | number
+  created_at?: Prisma.DateTimeFilter<"ProductVariant"> | Date | string
+  updated_at?: Prisma.DateTimeFilter<"ProductVariant"> | Date | string
   cart_item?: Prisma.CartItemListRelationFilter
   inventory_reservation?: Prisma.InventoryReservationListRelationFilter
   product_sync?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
@@ -225,8 +241,10 @@ export type ProductVariantOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   product_id?: Prisma.SortOrder
   attributes?: Prisma.SortOrder
-  stock?: Prisma.SortOrder
   price_override?: Prisma.SortOrderInput | Prisma.SortOrder
+  stock?: Prisma.SortOrder
+  created_at?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
   cart_item?: Prisma.CartItemOrderByRelationAggregateInput
   inventory_reservation?: Prisma.InventoryReservationOrderByRelationAggregateInput
   product_sync?: Prisma.ProductOrderByWithRelationInput
@@ -239,8 +257,10 @@ export type ProductVariantWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.ProductVariantWhereInput | Prisma.ProductVariantWhereInput[]
   product_id?: Prisma.StringFilter<"ProductVariant"> | string
   attributes?: Prisma.JsonFilter<"ProductVariant">
-  stock?: Prisma.IntFilter<"ProductVariant"> | number
   price_override?: Prisma.DecimalNullableFilter<"ProductVariant"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  stock?: Prisma.IntFilter<"ProductVariant"> | number
+  created_at?: Prisma.DateTimeFilter<"ProductVariant"> | Date | string
+  updated_at?: Prisma.DateTimeFilter<"ProductVariant"> | Date | string
   cart_item?: Prisma.CartItemListRelationFilter
   inventory_reservation?: Prisma.InventoryReservationListRelationFilter
   product_sync?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
@@ -250,8 +270,10 @@ export type ProductVariantOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   product_id?: Prisma.SortOrder
   attributes?: Prisma.SortOrder
-  stock?: Prisma.SortOrder
   price_override?: Prisma.SortOrderInput | Prisma.SortOrder
+  stock?: Prisma.SortOrder
+  created_at?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
   _count?: Prisma.ProductVariantCountOrderByAggregateInput
   _avg?: Prisma.ProductVariantAvgOrderByAggregateInput
   _max?: Prisma.ProductVariantMaxOrderByAggregateInput
@@ -266,15 +288,19 @@ export type ProductVariantScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"ProductVariant"> | string
   product_id?: Prisma.StringWithAggregatesFilter<"ProductVariant"> | string
   attributes?: Prisma.JsonWithAggregatesFilter<"ProductVariant">
-  stock?: Prisma.IntWithAggregatesFilter<"ProductVariant"> | number
   price_override?: Prisma.DecimalNullableWithAggregatesFilter<"ProductVariant"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  stock?: Prisma.IntWithAggregatesFilter<"ProductVariant"> | number
+  created_at?: Prisma.DateTimeWithAggregatesFilter<"ProductVariant"> | Date | string
+  updated_at?: Prisma.DateTimeWithAggregatesFilter<"ProductVariant"> | Date | string
 }
 
 export type ProductVariantCreateInput = {
   id?: string
   attributes: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  stock?: number
   price_override?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  stock?: number
+  created_at?: Date | string
+  updated_at?: Date | string
   cart_item?: Prisma.CartItemCreateNestedManyWithoutVariant_syncInput
   inventory_reservation?: Prisma.InventoryReservationCreateNestedManyWithoutVariant_syncInput
   product_sync: Prisma.ProductCreateNestedOneWithoutProduct_variantInput
@@ -284,8 +310,10 @@ export type ProductVariantUncheckedCreateInput = {
   id?: string
   product_id: string
   attributes: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  stock?: number
   price_override?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  stock?: number
+  created_at?: Date | string
+  updated_at?: Date | string
   cart_item?: Prisma.CartItemUncheckedCreateNestedManyWithoutVariant_syncInput
   inventory_reservation?: Prisma.InventoryReservationUncheckedCreateNestedManyWithoutVariant_syncInput
 }
@@ -293,8 +321,10 @@ export type ProductVariantUncheckedCreateInput = {
 export type ProductVariantUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  stock?: Prisma.IntFieldUpdateOperationsInput | number
   price_override?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  stock?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   cart_item?: Prisma.CartItemUpdateManyWithoutVariant_syncNestedInput
   inventory_reservation?: Prisma.InventoryReservationUpdateManyWithoutVariant_syncNestedInput
   product_sync?: Prisma.ProductUpdateOneRequiredWithoutProduct_variantNestedInput
@@ -304,8 +334,10 @@ export type ProductVariantUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   product_id?: Prisma.StringFieldUpdateOperationsInput | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  stock?: Prisma.IntFieldUpdateOperationsInput | number
   price_override?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  stock?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   cart_item?: Prisma.CartItemUncheckedUpdateManyWithoutVariant_syncNestedInput
   inventory_reservation?: Prisma.InventoryReservationUncheckedUpdateManyWithoutVariant_syncNestedInput
 }
@@ -314,23 +346,29 @@ export type ProductVariantCreateManyInput = {
   id?: string
   product_id: string
   attributes: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  stock?: number
   price_override?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  stock?: number
+  created_at?: Date | string
+  updated_at?: Date | string
 }
 
 export type ProductVariantUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  stock?: Prisma.IntFieldUpdateOperationsInput | number
   price_override?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  stock?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ProductVariantUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   product_id?: Prisma.StringFieldUpdateOperationsInput | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  stock?: Prisma.IntFieldUpdateOperationsInput | number
   price_override?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  stock?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ProductVariantListRelationFilter = {
@@ -347,32 +385,38 @@ export type ProductVariantCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   product_id?: Prisma.SortOrder
   attributes?: Prisma.SortOrder
-  stock?: Prisma.SortOrder
   price_override?: Prisma.SortOrder
+  stock?: Prisma.SortOrder
+  created_at?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
 }
 
 export type ProductVariantAvgOrderByAggregateInput = {
-  stock?: Prisma.SortOrder
   price_override?: Prisma.SortOrder
+  stock?: Prisma.SortOrder
 }
 
 export type ProductVariantMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   product_id?: Prisma.SortOrder
-  stock?: Prisma.SortOrder
   price_override?: Prisma.SortOrder
+  stock?: Prisma.SortOrder
+  created_at?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
 }
 
 export type ProductVariantMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   product_id?: Prisma.SortOrder
-  stock?: Prisma.SortOrder
   price_override?: Prisma.SortOrder
+  stock?: Prisma.SortOrder
+  created_at?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
 }
 
 export type ProductVariantSumOrderByAggregateInput = {
-  stock?: Prisma.SortOrder
   price_override?: Prisma.SortOrder
+  stock?: Prisma.SortOrder
 }
 
 export type ProductVariantScalarRelationFilter = {
@@ -422,20 +466,20 @@ export type ProductVariantUncheckedUpdateManyWithoutProduct_syncNestedInput = {
   deleteMany?: Prisma.ProductVariantScalarWhereInput | Prisma.ProductVariantScalarWhereInput[]
 }
 
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type NullableDecimalFieldUpdateOperationsInput = {
   set?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
   decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
   multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
   divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
+}
+
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
 }
 
 export type ProductVariantCreateNestedOneWithoutCart_itemInput = {
@@ -469,8 +513,10 @@ export type ProductVariantUpdateOneRequiredWithoutInventory_reservationNestedInp
 export type ProductVariantCreateWithoutProduct_syncInput = {
   id?: string
   attributes: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  stock?: number
   price_override?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  stock?: number
+  created_at?: Date | string
+  updated_at?: Date | string
   cart_item?: Prisma.CartItemCreateNestedManyWithoutVariant_syncInput
   inventory_reservation?: Prisma.InventoryReservationCreateNestedManyWithoutVariant_syncInput
 }
@@ -478,8 +524,10 @@ export type ProductVariantCreateWithoutProduct_syncInput = {
 export type ProductVariantUncheckedCreateWithoutProduct_syncInput = {
   id?: string
   attributes: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  stock?: number
   price_override?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  stock?: number
+  created_at?: Date | string
+  updated_at?: Date | string
   cart_item?: Prisma.CartItemUncheckedCreateNestedManyWithoutVariant_syncInput
   inventory_reservation?: Prisma.InventoryReservationUncheckedCreateNestedManyWithoutVariant_syncInput
 }
@@ -517,15 +565,19 @@ export type ProductVariantScalarWhereInput = {
   id?: Prisma.StringFilter<"ProductVariant"> | string
   product_id?: Prisma.StringFilter<"ProductVariant"> | string
   attributes?: Prisma.JsonFilter<"ProductVariant">
-  stock?: Prisma.IntFilter<"ProductVariant"> | number
   price_override?: Prisma.DecimalNullableFilter<"ProductVariant"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  stock?: Prisma.IntFilter<"ProductVariant"> | number
+  created_at?: Prisma.DateTimeFilter<"ProductVariant"> | Date | string
+  updated_at?: Prisma.DateTimeFilter<"ProductVariant"> | Date | string
 }
 
 export type ProductVariantCreateWithoutCart_itemInput = {
   id?: string
   attributes: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  stock?: number
   price_override?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  stock?: number
+  created_at?: Date | string
+  updated_at?: Date | string
   inventory_reservation?: Prisma.InventoryReservationCreateNestedManyWithoutVariant_syncInput
   product_sync: Prisma.ProductCreateNestedOneWithoutProduct_variantInput
 }
@@ -534,8 +586,10 @@ export type ProductVariantUncheckedCreateWithoutCart_itemInput = {
   id?: string
   product_id: string
   attributes: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  stock?: number
   price_override?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  stock?: number
+  created_at?: Date | string
+  updated_at?: Date | string
   inventory_reservation?: Prisma.InventoryReservationUncheckedCreateNestedManyWithoutVariant_syncInput
 }
 
@@ -558,8 +612,10 @@ export type ProductVariantUpdateToOneWithWhereWithoutCart_itemInput = {
 export type ProductVariantUpdateWithoutCart_itemInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  stock?: Prisma.IntFieldUpdateOperationsInput | number
   price_override?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  stock?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   inventory_reservation?: Prisma.InventoryReservationUpdateManyWithoutVariant_syncNestedInput
   product_sync?: Prisma.ProductUpdateOneRequiredWithoutProduct_variantNestedInput
 }
@@ -568,16 +624,20 @@ export type ProductVariantUncheckedUpdateWithoutCart_itemInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   product_id?: Prisma.StringFieldUpdateOperationsInput | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  stock?: Prisma.IntFieldUpdateOperationsInput | number
   price_override?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  stock?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   inventory_reservation?: Prisma.InventoryReservationUncheckedUpdateManyWithoutVariant_syncNestedInput
 }
 
 export type ProductVariantCreateWithoutInventory_reservationInput = {
   id?: string
   attributes: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  stock?: number
   price_override?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  stock?: number
+  created_at?: Date | string
+  updated_at?: Date | string
   cart_item?: Prisma.CartItemCreateNestedManyWithoutVariant_syncInput
   product_sync: Prisma.ProductCreateNestedOneWithoutProduct_variantInput
 }
@@ -586,8 +646,10 @@ export type ProductVariantUncheckedCreateWithoutInventory_reservationInput = {
   id?: string
   product_id: string
   attributes: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  stock?: number
   price_override?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  stock?: number
+  created_at?: Date | string
+  updated_at?: Date | string
   cart_item?: Prisma.CartItemUncheckedCreateNestedManyWithoutVariant_syncInput
 }
 
@@ -610,8 +672,10 @@ export type ProductVariantUpdateToOneWithWhereWithoutInventory_reservationInput 
 export type ProductVariantUpdateWithoutInventory_reservationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  stock?: Prisma.IntFieldUpdateOperationsInput | number
   price_override?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  stock?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   cart_item?: Prisma.CartItemUpdateManyWithoutVariant_syncNestedInput
   product_sync?: Prisma.ProductUpdateOneRequiredWithoutProduct_variantNestedInput
 }
@@ -620,23 +684,29 @@ export type ProductVariantUncheckedUpdateWithoutInventory_reservationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   product_id?: Prisma.StringFieldUpdateOperationsInput | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  stock?: Prisma.IntFieldUpdateOperationsInput | number
   price_override?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  stock?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   cart_item?: Prisma.CartItemUncheckedUpdateManyWithoutVariant_syncNestedInput
 }
 
 export type ProductVariantCreateManyProduct_syncInput = {
   id?: string
   attributes: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  stock?: number
   price_override?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  stock?: number
+  created_at?: Date | string
+  updated_at?: Date | string
 }
 
 export type ProductVariantUpdateWithoutProduct_syncInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  stock?: Prisma.IntFieldUpdateOperationsInput | number
   price_override?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  stock?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   cart_item?: Prisma.CartItemUpdateManyWithoutVariant_syncNestedInput
   inventory_reservation?: Prisma.InventoryReservationUpdateManyWithoutVariant_syncNestedInput
 }
@@ -644,8 +714,10 @@ export type ProductVariantUpdateWithoutProduct_syncInput = {
 export type ProductVariantUncheckedUpdateWithoutProduct_syncInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  stock?: Prisma.IntFieldUpdateOperationsInput | number
   price_override?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  stock?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   cart_item?: Prisma.CartItemUncheckedUpdateManyWithoutVariant_syncNestedInput
   inventory_reservation?: Prisma.InventoryReservationUncheckedUpdateManyWithoutVariant_syncNestedInput
 }
@@ -653,8 +725,10 @@ export type ProductVariantUncheckedUpdateWithoutProduct_syncInput = {
 export type ProductVariantUncheckedUpdateManyWithoutProduct_syncInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   attributes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  stock?: Prisma.IntFieldUpdateOperationsInput | number
   price_override?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  stock?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -701,8 +775,10 @@ export type ProductVariantSelect<ExtArgs extends runtime.Types.Extensions.Intern
   id?: boolean
   product_id?: boolean
   attributes?: boolean
-  stock?: boolean
   price_override?: boolean
+  stock?: boolean
+  created_at?: boolean
+  updated_at?: boolean
   cart_item?: boolean | Prisma.ProductVariant$cart_itemArgs<ExtArgs>
   inventory_reservation?: boolean | Prisma.ProductVariant$inventory_reservationArgs<ExtArgs>
   product_sync?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
@@ -713,8 +789,10 @@ export type ProductVariantSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   id?: boolean
   product_id?: boolean
   attributes?: boolean
-  stock?: boolean
   price_override?: boolean
+  stock?: boolean
+  created_at?: boolean
+  updated_at?: boolean
   product_sync?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["productVariant"]>
 
@@ -722,8 +800,10 @@ export type ProductVariantSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   id?: boolean
   product_id?: boolean
   attributes?: boolean
-  stock?: boolean
   price_override?: boolean
+  stock?: boolean
+  created_at?: boolean
+  updated_at?: boolean
   product_sync?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["productVariant"]>
 
@@ -731,11 +811,13 @@ export type ProductVariantSelectScalar = {
   id?: boolean
   product_id?: boolean
   attributes?: boolean
-  stock?: boolean
   price_override?: boolean
+  stock?: boolean
+  created_at?: boolean
+  updated_at?: boolean
 }
 
-export type ProductVariantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "product_id" | "attributes" | "stock" | "price_override", ExtArgs["result"]["productVariant"]>
+export type ProductVariantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "product_id" | "attributes" | "price_override" | "stock" | "created_at" | "updated_at", ExtArgs["result"]["productVariant"]>
 export type ProductVariantInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   cart_item?: boolean | Prisma.ProductVariant$cart_itemArgs<ExtArgs>
   inventory_reservation?: boolean | Prisma.ProductVariant$inventory_reservationArgs<ExtArgs>
@@ -760,8 +842,10 @@ export type $ProductVariantPayload<ExtArgs extends runtime.Types.Extensions.Inte
     id: string
     product_id: string
     attributes: runtime.JsonValue
-    stock: number
     price_override: runtime.Decimal | null
+    stock: number
+    created_at: Date
+    updated_at: Date
   }, ExtArgs["result"]["productVariant"]>
   composites: {}
 }
@@ -1191,8 +1275,10 @@ export interface ProductVariantFieldRefs {
   readonly id: Prisma.FieldRef<"ProductVariant", 'String'>
   readonly product_id: Prisma.FieldRef<"ProductVariant", 'String'>
   readonly attributes: Prisma.FieldRef<"ProductVariant", 'Json'>
-  readonly stock: Prisma.FieldRef<"ProductVariant", 'Int'>
   readonly price_override: Prisma.FieldRef<"ProductVariant", 'Decimal'>
+  readonly stock: Prisma.FieldRef<"ProductVariant", 'Int'>
+  readonly created_at: Prisma.FieldRef<"ProductVariant", 'DateTime'>
+  readonly updated_at: Prisma.FieldRef<"ProductVariant", 'DateTime'>
 }
     
 
@@ -1389,6 +1475,11 @@ export type ProductVariantFindManyArgs<ExtArgs extends runtime.Types.Extensions.
    * Skip the first `n` ProductVariants.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of ProductVariants.
+   */
   distinct?: Prisma.ProductVariantScalarFieldEnum | Prisma.ProductVariantScalarFieldEnum[]
 }
 
