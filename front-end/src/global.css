@@ -1,3 +1,4 @@
+@import "@fontsource-variable/inter";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -39,7 +40,7 @@ html, body {
         --sidebar-foreground: 240 5.3% 26.1%;
         --sidebar-primary: 240 5.9% 10%;
         --sidebar-primary-foreground: 0 0% 98%;
-        --sidebar-accent: 240 4.8% 95.9%;
+        --sidebar-accent: 0 0% 17% / 0.08;
         --sidebar-accent-foreground: 240 5.9% 10%;
         --sidebar-border: 220 13% 91%;
         --sidebar-ring: 217.2 91.2% 59.8%;
@@ -87,8 +88,14 @@ html, body {
     body {
         @apply bg-background text-foreground font-sans;
     }
+  .theme {
+    --font-heading: var(--font-sans);
+    --font-sans: 'Inter Variable';
+  }
+  html {
+    @apply font-sans;
+  }
 }
-
 
 @layer components {
 
@@ -98,6 +105,20 @@ html, body {
 
     .global-card {
         @apply p-4 rounded-2xl border bg-card text-card-foreground shadow-sm font-sans;
+    }
+
+    .global-card-hover {
+        @apply transition-shadow;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.17);
+    }
+    .global-card-hover:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+    .dark .global-card-hover {
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 4px 24px rgba(255, 255, 255, 0.04);
+    }
+    .dark .global-card-hover:hover {
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 4px 16px rgba(255, 255, 255, 0.06);
     }
 
     .global-input {

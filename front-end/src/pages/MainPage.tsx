@@ -69,34 +69,43 @@ export default function Page() {
             </Breadcrumb>
           </div>
 
-          <div className="flex flex-1 flex-col gap-4 p-4">
-            <div className="grid auto-rows-min gap-4 md:grid-cols-3">
+          <div className="flex flex-1 flex-col gap-4 p-4 ">
+            <div className="cursor-pointer grid auto-rows-min gap-4 grid-cols-[repeat(auto-fill,minmax(230px,1fr))]">
               {posts?.length ? (
                 posts.map((post: Posts) => (
                   <div
                     key={post.id}
-                    className="aspect-video rounded-xl bg-muted/50 flex flex-col items-center justify-center p-4"
+                    className="min-h-[300px] max-h-[300px] w-full rounded-xl bg-muted/50 flex flex-col justify-center p-4 global-card-hover overflow-hidden group"
                   >
                     <img
                       src={`${publicAPI.defaults.baseURL}/uploads?path=${encodeURIComponent(post.main_image)}`}
                       crossOrigin="anonymous"
                       alt={post.title}
-                      className="h-24 object-cover rounded mb-2"
+                      className="h-[165px] object-cover rounded mb-2 transition-transform duration-300 group-hover:scale-105"
                     />
-                    <span className="text-primary font-bold capitalize">
+                    <span
+                      className="capitalize text-[14px]"
+                      style={{
+                        display: "-webkit-box",
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: "vertical",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        wordBreak: "break-word",
+                      }}
+                    >
                       {post.title}
                     </span>
-                    <span className="text-sm">{post.description}</span>
-                    <span className="text-primary font-semibold mt-2">
+                    <span className="font-semibold mt-auto text-[16px] self-start">
                       R$ {post.base_price}
                     </span>
                   </div>
                 ))
               ) : (
-                <span>Nenhum post encontrado.</span>
+                <span>No post founds.</span>
               )}
             </div>
-            <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
+            {/* <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" /> */}
           </div>
         </SidebarInset>
       </SidebarProvider>

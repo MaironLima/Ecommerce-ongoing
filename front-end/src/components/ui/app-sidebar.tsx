@@ -72,11 +72,11 @@ export function AppSidebar({
   const displayCategories = [defaultCategory, ...categories];
 
   return (
-    <Sidebar collapsible="none" {...props}>
+    <Sidebar collapsible="none" {...props} className="border-r border-b">
       <SidebarHeader />
-      <SidebarContent>
+      <SidebarContent >
         <SidebarGroup>
-          <SidebarGroupLabel>Order by</SidebarGroupLabel>
+          <SidebarGroupLabel className="font-bold">Order by</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {defaultOrderBy.map((item) => (
@@ -98,7 +98,7 @@ export function AppSidebar({
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Categorys</SidebarGroupLabel>
+          <SidebarGroupLabel className="font-bold">Categorys</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {displayCategories.map((item: CategoryItem) => (
