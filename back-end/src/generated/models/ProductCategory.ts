@@ -210,7 +210,7 @@ export type ProductCategoryScalarWhereWithAggregatesInput = {
 export type ProductCategoryCreateInput = {
   id?: string
   category_sync: Prisma.CategoryCreateNestedOneWithoutProduct_categoryInput
-  product_sync: Prisma.ProductCreateNestedOneWithoutProduct_caregoryInput
+  product_sync: Prisma.ProductCreateNestedOneWithoutProduct_categoryInput
 }
 
 export type ProductCategoryUncheckedCreateInput = {
@@ -222,7 +222,7 @@ export type ProductCategoryUncheckedCreateInput = {
 export type ProductCategoryUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   category_sync?: Prisma.CategoryUpdateOneRequiredWithoutProduct_categoryNestedInput
-  product_sync?: Prisma.ProductUpdateOneRequiredWithoutProduct_caregoryNestedInput
+  product_sync?: Prisma.ProductUpdateOneRequiredWithoutProduct_categoryNestedInput
 }
 
 export type ProductCategoryUncheckedUpdateInput = {
@@ -406,7 +406,7 @@ export type ProductCategoryScalarWhereInput = {
 
 export type ProductCategoryCreateWithoutCategory_syncInput = {
   id?: string
-  product_sync: Prisma.ProductCreateNestedOneWithoutProduct_caregoryInput
+  product_sync: Prisma.ProductCreateNestedOneWithoutProduct_categoryInput
 }
 
 export type ProductCategoryUncheckedCreateWithoutCategory_syncInput = {
@@ -467,7 +467,7 @@ export type ProductCategoryCreateManyCategory_syncInput = {
 
 export type ProductCategoryUpdateWithoutCategory_syncInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  product_sync?: Prisma.ProductUpdateOneRequiredWithoutProduct_caregoryNestedInput
+  product_sync?: Prisma.ProductUpdateOneRequiredWithoutProduct_categoryNestedInput
 }
 
 export type ProductCategoryUncheckedUpdateWithoutCategory_syncInput = {

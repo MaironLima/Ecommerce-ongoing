@@ -4,6 +4,7 @@ export async function variantGetService(productId: string) {
   const variants = await prisma.productVariant.findMany({ where: { product_id: productId } });
 
   const map = variants.map(v => ({
+    id: v.id,
     attributes: v.attributes,
     stock: v.stock,
     priceOverride: v.price_override,

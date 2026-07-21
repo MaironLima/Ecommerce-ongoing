@@ -6,6 +6,7 @@ import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
 import RecoverPage from "@/pages/RecoverPage";
 import MainPage from "@/pages/MainPage";
+import ProductPage from "@/pages/ProductPage";
 
 const router = createBrowserRouter([
   {
@@ -14,13 +15,13 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       {
+        path: "",
+        element: <MainPage />
+      },
+      {
         path: "/m",
         element: <Buttons />,
       },
-      {
-        path: "",
-        element: <MainPage />
-      }
     ],
   },
   {
@@ -39,6 +40,16 @@ const router = createBrowserRouter([
         path: "recover",
         element: <RecoverPage />,
       },
+    ],
+  },
+  {
+    path: "/product",
+    errorElement: <ErrorPage />,
+    children: [
+      {
+        path: ":id",
+        element: <ProductPage />,
+      }
     ],
   },
 ]);

@@ -12,6 +12,7 @@ import publicAPI from "@/services/api/publicApi";
 import { useStore } from "@/stores/store";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface Posts {
   id: string;
@@ -25,6 +26,8 @@ export default function Page() {
   const [orderBy, setOrderBy] = useState("Relevance");
   const [page, setPage] = useState(1);
   const { appName, order, category, setCategory } = useStore();
+
+  const navigate = useNavigate();
 
   const { data: posts = [], refetch } = useQuery<Posts[]>({
     queryKey: ["posts", category, order, page],
@@ -41,6 +44,10 @@ export default function Page() {
   useEffect(() => {
     refetch();
   }, [category]);
+
+  function onClickHandle(id: string) {
+    navigate(`/product/${id}`)
+  }
 
   return (
     <div className="flex flex-col min-h-svh">
@@ -70,11 +77,14 @@ export default function Page() {
           </div>
 
           <div className="flex flex-1 flex-col gap-4 p-4 ">
-            <div className="cursor-pointer grid auto-rows-min gap-4 grid-cols-[repeat(auto-fill,minmax(230px,1fr))]">
+            <div
+              className="cursor-pointer grid auto-rows-min gap-4 grid-cols-[repeat(auto-fill,minmax(230px,1fr))]"
+            >
               {posts?.length ? (
                 posts.map((post: Posts) => (
                   <div
                     key={post.id}
+                    onClick={() => onClickHandle(post.id)}
                     className="min-h-[300px] max-h-[300px] w-full rounded-xl bg-muted/50 flex flex-col justify-center p-4 global-card-hover overflow-hidden group"
                   >
                     <img

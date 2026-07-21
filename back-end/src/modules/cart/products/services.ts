@@ -117,7 +117,14 @@ export async function productsSearchService(
 }
 
 export async function productsGetService(id: string) {
-  const result = await prisma.product.findUnique({ where: { id } });
+  const result = await prisma.product.findUnique({
+    where: { id },
+    include: {
+      extra_imagens: true,
+      product_category: { include: { category_sync: { select: { name: true } } } },
+    },
+  });
+
   if (!result) throw new Error("Can't find the product");
 
   return { result };

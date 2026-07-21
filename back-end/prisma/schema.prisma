@@ -41,7 +41,7 @@ model Product {
   updated_at       DateTime                 @updatedAt
   search_vector    Unsupported("tsvector")?
   extra_imagens    ExtraImagens[]
-  product_caregory ProductCategory[]
+  product_category ProductCategory[]
   product_variant  ProductVariant[]
   review           Review[]
 

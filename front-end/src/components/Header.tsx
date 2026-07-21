@@ -1,18 +1,24 @@
 import { Search, CircleUser, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import { ModeToggle } from "./ModeToggle";
+import { useNavigate } from "react-router-dom";
 
 function Header() {
   const [valor, setValor] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
   };
 
+  const onClickIcon = () => {
+    navigate("/");
+  }
+
   return (
     <header className="bg-primary h-16 w-full flex items-center justify-between text-white text-xl px-4">
       <div>
-        <button type="button">
+        <button onClick={onClickIcon} type="button">
           <img src="/vite.svg" alt="Logo" className="h-10" />
         </button>
       </div>
