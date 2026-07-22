@@ -8,11 +8,12 @@ import { requestLogger } from './common/utils/logmiddleware.js';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import userRoutes from './modules/auth/routes.js';
-import productsRoutes from './modules/cart/products/routes.js';
-import { variantsRoutes } from './modules/cart/variants/routes.js';
-import catalogRoutes from './modules/catalog/routes.js';
+import productsRoutes from './modules/catalog/products/routes.js';
+import { variantsRoutes } from './modules/catalog/variants/routes.js';
 import path from 'path';
 import fs from 'fs';
+import cartRoutes from './modules/cart/routes.js';
+import { startCronJobs } from './jobs/cron.js';
 
 const app = express();
 
@@ -40,7 +41,6 @@ app.use(
     noSniff: true,
     referrerPolicy: { policy: 'no-referrer' },
     xssFilter: true,
-    // CORREÇÃO AQUI: Diz para o Helmet liberar recursos cross-origin (como imagens)
     crossOriginResourcePolicy: { policy: 'cross-origin' }, 
   }),
 );
@@ -106,8 +106,10 @@ app.use('/ping', pingRoutes);
 app.use('/auth', userRoutes);
 app.use('/products', productsRoutes); 
 app.use('/variants', variantsRoutes);
-app.use('/catalog', catalogRoutes);
+app.use('/cart', cartRoutes);
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
+  startCronJobs();
+  console.log("[cron] Cron jobs iniciados");
 });

@@ -189,15 +189,15 @@ export type CartOrderByWithRelationInput = {
 
 export type CartWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  user_id?: string
   AND?: Prisma.CartWhereInput | Prisma.CartWhereInput[]
   OR?: Prisma.CartWhereInput[]
   NOT?: Prisma.CartWhereInput | Prisma.CartWhereInput[]
-  user_id?: Prisma.StringFilter<"Cart"> | string
   created_at?: Prisma.DateTimeFilter<"Cart"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"Cart"> | Date | string
   id_sync?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   cart_item?: Prisma.CartItemListRelationFilter
-}, "id">
+}, "id" | "user_id">
 
 export type CartOrderByWithAggregationInput = {
   id?: Prisma.SortOrder

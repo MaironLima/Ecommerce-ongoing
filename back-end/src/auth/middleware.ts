@@ -5,32 +5,45 @@ import { JWT_SECRET, REFRESH_SECRET } from '../config/env.js';
 
 
 export function auth(req: Request, res: Response, next: NextFunction) {
-  const accessToken = req.headers.authorization;
-  const refreshToken = req.cookies.refreshToken;
+  const rawAuth = req.headers.authorization;
+  const accessToken = rawAuth?.startsWith('Bearer ')
+    ? rawAuth.slice(7).trim()
+    : rawAuth?.trim();
+  const refreshToken = req.cookies?.refreshToken;
 
   if (!accessToken && !refreshToken) {
-    return res.status(401).json({ error: 'The tokens must be provided' });
+    return res.status(401).json({
+      error: 'The tokens must be provided',
+      code: 'UNAUTHENTICATED',
+    });
   }
-  if(!JWT_SECRET) {
-    return res.status(401).json({ error: 'Token not found' });
+  if (!JWT_SECRET) {
+    return res.status(401).json({
+      error: 'Token not found',
+      code: 'UNAUTHENTICATED',
+    });
   }
-  if(!REFRESH_SECRET) {
-    return res.status(401).json({ error: 'Token not found' });
+  if (!REFRESH_SECRET) {
+    return res.status(401).json({
+      error: 'Token not found',
+      code: 'UNAUTHENTICATED',
+    });
   }
 
   try {
-    if (accessToken){
-      const payload = jwt.verify(accessToken, JWT_SECRET);
-      (req as any).user = payload;
-      next();
+    let payload: any;
+    if (accessToken) {
+      payload = jwt.verify(accessToken, JWT_SECRET);
     } else {
-      const payload = jwt.verify(refreshToken, REFRESH_SECRET);
-      (req as any).user = payload;
-      next();
+      payload = jwt.verify(refreshToken, REFRESH_SECRET);
     }
-  
-  } catch (err) {
-    console.error("Erro ao verificar JWT:", err);
-    return res.status(401).json({ error: 'Invalid token' });
+    (req as any).user = payload;
+    next();
+  } catch (err: any) {
+    const isExpired = err?.name === 'TokenExpiredError';
+    return res.status(401).json({
+      error: isExpired ? 'Session expired' : 'Invalid token',
+      code: isExpired ? 'TOKEN_EXPIRED' : 'UNAUTHENTICATED',
+    });
   }
 }

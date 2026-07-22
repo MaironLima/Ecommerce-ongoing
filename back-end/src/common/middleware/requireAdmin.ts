@@ -3,7 +3,10 @@ import jwt from 'jsonwebtoken';
 import { JWT_SECRET, REFRESH_SECRET } from '../../config/env.js';
 
 export default function requireAdmin(req: Request, res: Response, next: NextFunction) {
-  const accessToken = req.headers.authorization;
+  const rawAuth = req.headers.authorization;
+  const accessToken = rawAuth?.startsWith('Bearer ')
+    ? rawAuth.slice(7).trim()
+    : rawAuth?.trim();
   const refreshToken = req.cookies?.refreshToken;
 
   if (!accessToken && !refreshToken) {
