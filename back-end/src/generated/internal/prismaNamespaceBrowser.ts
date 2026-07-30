@@ -62,7 +62,9 @@ export const ModelName = {
   CartItem: 'CartItem',
   Review: 'Review',
   InventoryReservation: 'InventoryReservation',
-  Notification: 'Notification'
+  Notification: 'Notification',
+  Order: 'Order',
+  OrderItem: 'OrderItem'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -196,7 +198,8 @@ export const InventoryReservationScalarFieldEnum = {
   id: 'id',
   variant_id: 'variant_id',
   quantity: 'quantity',
-  expires_at: 'expires_at'
+  expires_at: 'expires_at',
+  cart_item_id: 'cart_item_id'
 } as const
 
 export type InventoryReservationScalarFieldEnum = (typeof InventoryReservationScalarFieldEnum)[keyof typeof InventoryReservationScalarFieldEnum]
@@ -213,6 +216,36 @@ export const NotificationScalarFieldEnum = {
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
 
 
+export const OrderScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  status: 'status',
+  total: 'total',
+  currency: 'currency',
+  stripe_payment_intent_id: 'stripe_payment_intent_id',
+  stripe_client_secret: 'stripe_client_secret',
+  shipping_address: 'shipping_address',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
+
+
+export const OrderItemScalarFieldEnum = {
+  id: 'id',
+  order_id: 'order_id',
+  variant_id: 'variant_id',
+  cart_item_id: 'cart_item_id',
+  quantity: 'quantity',
+  unit_price_snapshot: 'unit_price_snapshot',
+  product_title_snapshot: 'product_title_snapshot',
+  variant_attributes_snapshot: 'variant_attributes_snapshot'
+} as const
+
+export type OrderItemScalarFieldEnum = (typeof OrderItemScalarFieldEnum)[keyof typeof OrderItemScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -226,6 +259,14 @@ export const JsonNullValueInput = {
 } as const
 
 export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {

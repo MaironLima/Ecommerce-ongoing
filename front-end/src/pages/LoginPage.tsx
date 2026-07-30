@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CardAction } from "../components/ui/corrections";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import publicAPI from "@/services/api/publicApi";
 import { useStore } from "@/stores/store";
 import { useMutation } from "@tanstack/react-query";
@@ -27,6 +27,8 @@ export function LoginPage() {
   const [wait, setWait] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = (location.state as { from?: string } | null)?.from ?? "/";
 
   function popUp(): void {
     setMes(true);
@@ -51,7 +53,7 @@ export function LoginPage() {
       const { setName, setAccessToken } = useStore.getState();
       setName(data.name);
       setAccessToken(data.accessToken);
-      navigate("/");
+      navigate(from);
     },
     onError: () => {
       waitTime()
@@ -72,7 +74,7 @@ export function LoginPage() {
     if (wait) {
       throw new Error("Wait 3 seconds and try again");
     }
-    navigate("/auth/register");
+    navigate("/auth/register", { state: { from } });
   };
 
   const handleRecover = async (
@@ -167,7 +169,7 @@ export function LoginPage() {
                 </div>
               </div>
               <Button type="submit" className="w-full">
-                Login
+                Login {isLoginPending && <Spinner />}
               </Button>
             </div>
           </form>
@@ -175,7 +177,7 @@ export function LoginPage() {
         <CardFooter className="flex-col gap-2">
           <CardAction className="ml-auto">
             <Button variant="link" onClick={handleSignin}>
-              Sign Up {isLoginPending && <Spinner />}
+              Sign Up
             </Button>
           </CardAction>
         </CardFooter>

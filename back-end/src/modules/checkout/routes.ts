@@ -1,9 +1,12 @@
 import { Router } from 'express';
-import { checkoutConfirmController, checkoutCreateController } from './controllers';
+import { auth } from '../../auth/middleware.js';
+import { checkoutCreateController, checkoutStatusController } from './controllers.js';
 
 const checkoutRoutes: Router = Router();
 
-checkoutRoutes.post('/create-intent', checkoutCreateController);
-checkoutRoutes.post('/confirm', checkoutConfirmController); // via websocket Stripe
+checkoutRoutes.use(auth);
+
+checkoutRoutes.post('/session', checkoutCreateController);
+checkoutRoutes.get('/:orderId/status', checkoutStatusController);
 
 export default checkoutRoutes;

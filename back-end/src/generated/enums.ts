@@ -16,3 +16,14 @@ export const Permissions = {
 } as const
 
 export type Permissions = (typeof Permissions)[keyof typeof Permissions]
+
+
+export const OrderStatus = {
+  PENDING: 'PENDING',
+  PAID: 'PAID',
+  FAILED: 'FAILED',
+  CANCELLED: 'CANCELLED',
+  REFUNDED: 'REFUNDED'
+} as const
+
+export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus]

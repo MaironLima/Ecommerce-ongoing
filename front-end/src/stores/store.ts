@@ -21,9 +21,15 @@ interface TokenState {
 }
 
 export const useStore = create<TokenState>((set) => ({
-  accessToken: "",
-  setAccessToken: (token) => set({ accessToken: token }),
-  clearAccesToken: () => set({ accessToken: "" }),
+  accessToken: localStorage.getItem("accessToken") ?? "",
+  setAccessToken: (token) => {
+    localStorage.setItem("accessToken", token);
+    set({ accessToken: token });
+  },
+  clearAccesToken: () => {
+    localStorage.removeItem("accessToken");
+    set({ accessToken: "" });
+  },
 
   name: "",
   setName: (name) => set({ name: name }),

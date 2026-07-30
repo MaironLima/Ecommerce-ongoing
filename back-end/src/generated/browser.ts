@@ -77,3 +77,13 @@ export type InventoryReservation = Prisma.InventoryReservationModel
  * 
  */
 export type Notification = Prisma.NotificationModel
+/**
+ * Model Order
+ * 
+ */
+export type Order = Prisma.OrderModel
+/**
+ * Model OrderItem
+ * 
+ */
+export type OrderItem = Prisma.OrderItemModel

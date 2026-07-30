@@ -13,6 +13,9 @@ import userRoutes from './modules/auth/routes.js';
 import productsRoutes from './modules/catalog/products/routes.js';
 import { variantsRoutes } from './modules/catalog/variants/routes.js';
 import cartRoutes from './modules/cart/routes.js';
+import checkoutRoutes from './modules/checkout/routes.js';
+import ordersRoutes from './modules/orders/routes.js';
+import stripeWebhookRoutes from './modules/webhooks/stripe/routes.js';
 
 export function createApp(): Express {
   const app = express();
@@ -23,6 +26,13 @@ export function createApp(): Express {
       credentials: true,
     }),
   );
+
+  app.use(
+    '/webhooks/stripe',
+    express.raw({ type: 'application/json' }),
+    stripeWebhookRoutes,
+  );
+
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
@@ -39,7 +49,7 @@ export function createApp(): Express {
         preload: true,
       },
       noSniff: true,
-      referrerPolicy: { policy: 'no-referrer' },
+      referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
       xssFilter: true,
       crossOriginResourcePolicy: { policy: 'cross-origin' },
     }),
@@ -101,6 +111,8 @@ export function createApp(): Express {
   app.use('/products', productsRoutes);
   app.use('/variants', variantsRoutes);
   app.use('/cart', cartRoutes);
+  app.use('/checkout', checkoutRoutes);
+  app.use('/orders', ordersRoutes);
 
   return app;
 }

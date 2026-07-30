@@ -1,10 +1,13 @@
 import { Plus, Minus } from "lucide-react";
+import type { AxiosError } from "axios";
 import publicAPI from "@/services/api/publicApi";
-import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useMemo, useRef, useState } from "react";
 import Header from "@/components/Header";
 import UniversalBreadcrum from "@/components/UniversalBreadcrum";
+import { useCartStore } from "@/stores/cartStore";
+import { useStore } from "@/stores/store";
 
 interface Product {
   id: string;
@@ -25,10 +28,34 @@ interface Variant {
 
 function ProductPage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const accessToken = useStore((s) => s.accessToken);
+  const addToCart = useCartStore((s) => s.addToCart);
   const [quantity, setQuantity] = useState<number>(1);
   const [activeVariantId, setActiveVariantId] = useState<string | null>(null);
   const [activeImage, setActiveImage] = useState<number>(0);
+  const [cartMsg, setCartMsg] = useState<string | null>(null);
   const activeVariantRef = useRef<HTMLDivElement | null>(null);
+
+  const addToCartMutation = useMutation({
+    mutationFn: async () => {
+      const variantId = activeVariant?.id;
+      if (!variantId) throw new Error("Please select a variant");
+      await addToCart(variantId, quantity);
+    },
+    onSuccess: () => setCartMsg("Added to cart!"),
+    onError: (e: AxiosError<{ error?: string }>) =>
+      setCartMsg(e?.response?.data?.error ?? "Failed to add to cart"),
+  });
+
+  const handleAddToCart = () => {
+    if (!accessToken) {
+      navigate("/auth/login", { state: { from: location.pathname } });
+      return;
+    }
+    addToCartMutation.mutate();
+  };
 
   const {
     data: product,
@@ -221,11 +248,30 @@ function ProductPage() {
                   <Plus size={16} />
                 </button>
               </div>
-              <button className="global-btn">
-                Add to cart
+              <button
+                className="global-btn"
+                onClick={handleAddToCart}
+                disabled={addToCartMutation.isPending || !activeVariant}
+                title="Add to cart"
+              >
+                {addToCartMutation.isPending ? "Adding..." : "Add to cart"}
               </button>
             </div>
           </div>
+
+          {cartMsg && (
+            <span
+              className={
+                "text-sm " +
+                (cartMsg.startsWith("Added")
+                  ? "text-primary"
+                  : "text-destructive")
+              }
+              role="status"
+            >
+              {cartMsg}
+            </span>
+          )}
 
           <div className="flex flex-col gap-2">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">

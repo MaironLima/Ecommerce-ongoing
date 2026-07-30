@@ -1,11 +1,21 @@
 import { Search, CircleUser, ShoppingCart } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ModeToggle } from "./ModeToggle";
 import { useNavigate } from "react-router-dom";
+import { useCartStore } from "@/stores/cartStore";
+import { useStore } from "@/stores/store";
 
 function Header() {
   const [valor, setValor] = useState("");
   const navigate = useNavigate();
+  const cartItems = useCartStore((s) => s.items);
+  const fetchCart = useCartStore((s) => s.fetchCart);
+  const cartCount = cartItems.length;
+  const accessToken = useStore((s) => s.accessToken);
+
+  useEffect(() => {
+    if (accessToken) void fetchCart();
+  }, [accessToken, fetchCart]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -13,7 +23,7 @@ function Header() {
 
   const onClickIcon = () => {
     navigate("/");
-  }
+  };
 
   return (
     <header className="bg-primary h-16 w-full flex items-center justify-between text-white text-xl px-4">
@@ -39,18 +49,32 @@ function Header() {
         <ModeToggle />
 
         <div className="flex items-center overflow-hidden rounded">
-          <span className="global-btn font-bold flex items-center rounded-none rounded-l">
-            3
-          </span>
+          {/* <span className="global-btn font-bold flex items-center rounded-none rounded-l">
+          </span> */}
           <button
             type="button"
             title="Cart"
-            className="global-btn flex items-center rounded-none rounded-r"
-          >
+            className="global-btn flex items-center rounded-none rounded-r gap-2"
+            onClick={() => navigate("/cart")}
+            >
+            {cartCount}
             <ShoppingCart />
           </button>
         </div>
-        <button title="Profile" type="button" className="global-btn">
+        <button
+          title="My orders"
+          type="button"
+          className="global-btn"
+          onClick={() => navigate("/orders")}
+        >
+          Orders
+        </button>
+        <button
+          title="Profile"
+          type="button"
+          className="global-btn"
+          onClick={() => navigate("/auth/login")}
+        >
           <CircleUser />
         </button>
       </div>

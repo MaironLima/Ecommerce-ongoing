@@ -39,6 +39,7 @@ export type InventoryReservationMinAggregateOutputType = {
   variant_id: string | null
   quantity: number | null
   expires_at: Date | null
+  cart_item_id: string | null
 }
 
 export type InventoryReservationMaxAggregateOutputType = {
@@ -46,6 +47,7 @@ export type InventoryReservationMaxAggregateOutputType = {
   variant_id: string | null
   quantity: number | null
   expires_at: Date | null
+  cart_item_id: string | null
 }
 
 export type InventoryReservationCountAggregateOutputType = {
@@ -53,6 +55,7 @@ export type InventoryReservationCountAggregateOutputType = {
   variant_id: number
   quantity: number
   expires_at: number
+  cart_item_id: number
   _all: number
 }
 
@@ -70,6 +73,7 @@ export type InventoryReservationMinAggregateInputType = {
   variant_id?: true
   quantity?: true
   expires_at?: true
+  cart_item_id?: true
 }
 
 export type InventoryReservationMaxAggregateInputType = {
@@ -77,6 +81,7 @@ export type InventoryReservationMaxAggregateInputType = {
   variant_id?: true
   quantity?: true
   expires_at?: true
+  cart_item_id?: true
 }
 
 export type InventoryReservationCountAggregateInputType = {
@@ -84,6 +89,7 @@ export type InventoryReservationCountAggregateInputType = {
   variant_id?: true
   quantity?: true
   expires_at?: true
+  cart_item_id?: true
   _all?: true
 }
 
@@ -178,6 +184,7 @@ export type InventoryReservationGroupByOutputType = {
   variant_id: string
   quantity: number
   expires_at: Date
+  cart_item_id: string | null
   _count: InventoryReservationCountAggregateOutputType | null
   _avg: InventoryReservationAvgAggregateOutputType | null
   _sum: InventoryReservationSumAggregateOutputType | null
@@ -208,7 +215,9 @@ export type InventoryReservationWhereInput = {
   variant_id?: Prisma.StringFilter<"InventoryReservation"> | string
   quantity?: Prisma.IntFilter<"InventoryReservation"> | number
   expires_at?: Prisma.DateTimeFilter<"InventoryReservation"> | Date | string
+  cart_item_id?: Prisma.StringNullableFilter<"InventoryReservation"> | string | null
   variant_sync?: Prisma.XOR<Prisma.ProductVariantScalarRelationFilter, Prisma.ProductVariantWhereInput>
+  cart_item_sync?: Prisma.XOR<Prisma.CartItemNullableScalarRelationFilter, Prisma.CartItemWhereInput> | null
 }
 
 export type InventoryReservationOrderByWithRelationInput = {
@@ -216,11 +225,14 @@ export type InventoryReservationOrderByWithRelationInput = {
   variant_id?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   expires_at?: Prisma.SortOrder
+  cart_item_id?: Prisma.SortOrderInput | Prisma.SortOrder
   variant_sync?: Prisma.ProductVariantOrderByWithRelationInput
+  cart_item_sync?: Prisma.CartItemOrderByWithRelationInput
 }
 
 export type InventoryReservationWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  cart_item_id?: string
   AND?: Prisma.InventoryReservationWhereInput | Prisma.InventoryReservationWhereInput[]
   OR?: Prisma.InventoryReservationWhereInput[]
   NOT?: Prisma.InventoryReservationWhereInput | Prisma.InventoryReservationWhereInput[]
@@ -228,13 +240,15 @@ export type InventoryReservationWhereUniqueInput = Prisma.AtLeast<{
   quantity?: Prisma.IntFilter<"InventoryReservation"> | number
   expires_at?: Prisma.DateTimeFilter<"InventoryReservation"> | Date | string
   variant_sync?: Prisma.XOR<Prisma.ProductVariantScalarRelationFilter, Prisma.ProductVariantWhereInput>
-}, "id">
+  cart_item_sync?: Prisma.XOR<Prisma.CartItemNullableScalarRelationFilter, Prisma.CartItemWhereInput> | null
+}, "id" | "cart_item_id">
 
 export type InventoryReservationOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   variant_id?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   expires_at?: Prisma.SortOrder
+  cart_item_id?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.InventoryReservationCountOrderByAggregateInput
   _avg?: Prisma.InventoryReservationAvgOrderByAggregateInput
   _max?: Prisma.InventoryReservationMaxOrderByAggregateInput
@@ -250,6 +264,7 @@ export type InventoryReservationScalarWhereWithAggregatesInput = {
   variant_id?: Prisma.StringWithAggregatesFilter<"InventoryReservation"> | string
   quantity?: Prisma.IntWithAggregatesFilter<"InventoryReservation"> | number
   expires_at?: Prisma.DateTimeWithAggregatesFilter<"InventoryReservation"> | Date | string
+  cart_item_id?: Prisma.StringNullableWithAggregatesFilter<"InventoryReservation"> | string | null
 }
 
 export type InventoryReservationCreateInput = {
@@ -257,6 +272,7 @@ export type InventoryReservationCreateInput = {
   quantity?: number
   expires_at?: Date | string
   variant_sync: Prisma.ProductVariantCreateNestedOneWithoutInventory_reservationInput
+  cart_item_sync?: Prisma.CartItemCreateNestedOneWithoutInventory_reservationInput
 }
 
 export type InventoryReservationUncheckedCreateInput = {
@@ -264,6 +280,7 @@ export type InventoryReservationUncheckedCreateInput = {
   variant_id: string
   quantity?: number
   expires_at?: Date | string
+  cart_item_id?: string | null
 }
 
 export type InventoryReservationUpdateInput = {
@@ -271,6 +288,7 @@ export type InventoryReservationUpdateInput = {
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   expires_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   variant_sync?: Prisma.ProductVariantUpdateOneRequiredWithoutInventory_reservationNestedInput
+  cart_item_sync?: Prisma.CartItemUpdateOneWithoutInventory_reservationNestedInput
 }
 
 export type InventoryReservationUncheckedUpdateInput = {
@@ -278,6 +296,7 @@ export type InventoryReservationUncheckedUpdateInput = {
   variant_id?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   expires_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  cart_item_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type InventoryReservationCreateManyInput = {
@@ -285,6 +304,7 @@ export type InventoryReservationCreateManyInput = {
   variant_id: string
   quantity?: number
   expires_at?: Date | string
+  cart_item_id?: string | null
 }
 
 export type InventoryReservationUpdateManyMutationInput = {
@@ -298,6 +318,7 @@ export type InventoryReservationUncheckedUpdateManyInput = {
   variant_id?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   expires_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  cart_item_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type InventoryReservationListRelationFilter = {
@@ -310,11 +331,17 @@ export type InventoryReservationOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type InventoryReservationNullableScalarRelationFilter = {
+  is?: Prisma.InventoryReservationWhereInput | null
+  isNot?: Prisma.InventoryReservationWhereInput | null
+}
+
 export type InventoryReservationCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   variant_id?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   expires_at?: Prisma.SortOrder
+  cart_item_id?: Prisma.SortOrder
 }
 
 export type InventoryReservationAvgOrderByAggregateInput = {
@@ -326,6 +353,7 @@ export type InventoryReservationMaxOrderByAggregateInput = {
   variant_id?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   expires_at?: Prisma.SortOrder
+  cart_item_id?: Prisma.SortOrder
 }
 
 export type InventoryReservationMinOrderByAggregateInput = {
@@ -333,6 +361,7 @@ export type InventoryReservationMinOrderByAggregateInput = {
   variant_id?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   expires_at?: Prisma.SortOrder
+  cart_item_id?: Prisma.SortOrder
 }
 
 export type InventoryReservationSumOrderByAggregateInput = {
@@ -381,16 +410,50 @@ export type InventoryReservationUncheckedUpdateManyWithoutVariant_syncNestedInpu
   deleteMany?: Prisma.InventoryReservationScalarWhereInput | Prisma.InventoryReservationScalarWhereInput[]
 }
 
+export type InventoryReservationCreateNestedOneWithoutCart_item_syncInput = {
+  create?: Prisma.XOR<Prisma.InventoryReservationCreateWithoutCart_item_syncInput, Prisma.InventoryReservationUncheckedCreateWithoutCart_item_syncInput>
+  connectOrCreate?: Prisma.InventoryReservationCreateOrConnectWithoutCart_item_syncInput
+  connect?: Prisma.InventoryReservationWhereUniqueInput
+}
+
+export type InventoryReservationUncheckedCreateNestedOneWithoutCart_item_syncInput = {
+  create?: Prisma.XOR<Prisma.InventoryReservationCreateWithoutCart_item_syncInput, Prisma.InventoryReservationUncheckedCreateWithoutCart_item_syncInput>
+  connectOrCreate?: Prisma.InventoryReservationCreateOrConnectWithoutCart_item_syncInput
+  connect?: Prisma.InventoryReservationWhereUniqueInput
+}
+
+export type InventoryReservationUpdateOneWithoutCart_item_syncNestedInput = {
+  create?: Prisma.XOR<Prisma.InventoryReservationCreateWithoutCart_item_syncInput, Prisma.InventoryReservationUncheckedCreateWithoutCart_item_syncInput>
+  connectOrCreate?: Prisma.InventoryReservationCreateOrConnectWithoutCart_item_syncInput
+  upsert?: Prisma.InventoryReservationUpsertWithoutCart_item_syncInput
+  disconnect?: Prisma.InventoryReservationWhereInput | boolean
+  delete?: Prisma.InventoryReservationWhereInput | boolean
+  connect?: Prisma.InventoryReservationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.InventoryReservationUpdateToOneWithWhereWithoutCart_item_syncInput, Prisma.InventoryReservationUpdateWithoutCart_item_syncInput>, Prisma.InventoryReservationUncheckedUpdateWithoutCart_item_syncInput>
+}
+
+export type InventoryReservationUncheckedUpdateOneWithoutCart_item_syncNestedInput = {
+  create?: Prisma.XOR<Prisma.InventoryReservationCreateWithoutCart_item_syncInput, Prisma.InventoryReservationUncheckedCreateWithoutCart_item_syncInput>
+  connectOrCreate?: Prisma.InventoryReservationCreateOrConnectWithoutCart_item_syncInput
+  upsert?: Prisma.InventoryReservationUpsertWithoutCart_item_syncInput
+  disconnect?: Prisma.InventoryReservationWhereInput | boolean
+  delete?: Prisma.InventoryReservationWhereInput | boolean
+  connect?: Prisma.InventoryReservationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.InventoryReservationUpdateToOneWithWhereWithoutCart_item_syncInput, Prisma.InventoryReservationUpdateWithoutCart_item_syncInput>, Prisma.InventoryReservationUncheckedUpdateWithoutCart_item_syncInput>
+}
+
 export type InventoryReservationCreateWithoutVariant_syncInput = {
   id?: string
   quantity?: number
   expires_at?: Date | string
+  cart_item_sync?: Prisma.CartItemCreateNestedOneWithoutInventory_reservationInput
 }
 
 export type InventoryReservationUncheckedCreateWithoutVariant_syncInput = {
   id?: string
   quantity?: number
   expires_at?: Date | string
+  cart_item_id?: string | null
 }
 
 export type InventoryReservationCreateOrConnectWithoutVariant_syncInput = {
@@ -427,30 +490,79 @@ export type InventoryReservationScalarWhereInput = {
   variant_id?: Prisma.StringFilter<"InventoryReservation"> | string
   quantity?: Prisma.IntFilter<"InventoryReservation"> | number
   expires_at?: Prisma.DateTimeFilter<"InventoryReservation"> | Date | string
+  cart_item_id?: Prisma.StringNullableFilter<"InventoryReservation"> | string | null
+}
+
+export type InventoryReservationCreateWithoutCart_item_syncInput = {
+  id?: string
+  quantity?: number
+  expires_at?: Date | string
+  variant_sync: Prisma.ProductVariantCreateNestedOneWithoutInventory_reservationInput
+}
+
+export type InventoryReservationUncheckedCreateWithoutCart_item_syncInput = {
+  id?: string
+  variant_id: string
+  quantity?: number
+  expires_at?: Date | string
+}
+
+export type InventoryReservationCreateOrConnectWithoutCart_item_syncInput = {
+  where: Prisma.InventoryReservationWhereUniqueInput
+  create: Prisma.XOR<Prisma.InventoryReservationCreateWithoutCart_item_syncInput, Prisma.InventoryReservationUncheckedCreateWithoutCart_item_syncInput>
+}
+
+export type InventoryReservationUpsertWithoutCart_item_syncInput = {
+  update: Prisma.XOR<Prisma.InventoryReservationUpdateWithoutCart_item_syncInput, Prisma.InventoryReservationUncheckedUpdateWithoutCart_item_syncInput>
+  create: Prisma.XOR<Prisma.InventoryReservationCreateWithoutCart_item_syncInput, Prisma.InventoryReservationUncheckedCreateWithoutCart_item_syncInput>
+  where?: Prisma.InventoryReservationWhereInput
+}
+
+export type InventoryReservationUpdateToOneWithWhereWithoutCart_item_syncInput = {
+  where?: Prisma.InventoryReservationWhereInput
+  data: Prisma.XOR<Prisma.InventoryReservationUpdateWithoutCart_item_syncInput, Prisma.InventoryReservationUncheckedUpdateWithoutCart_item_syncInput>
+}
+
+export type InventoryReservationUpdateWithoutCart_item_syncInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  expires_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  variant_sync?: Prisma.ProductVariantUpdateOneRequiredWithoutInventory_reservationNestedInput
+}
+
+export type InventoryReservationUncheckedUpdateWithoutCart_item_syncInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  variant_id?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  expires_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type InventoryReservationCreateManyVariant_syncInput = {
   id?: string
   quantity?: number
   expires_at?: Date | string
+  cart_item_id?: string | null
 }
 
 export type InventoryReservationUpdateWithoutVariant_syncInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   expires_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  cart_item_sync?: Prisma.CartItemUpdateOneWithoutInventory_reservationNestedInput
 }
 
 export type InventoryReservationUncheckedUpdateWithoutVariant_syncInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   expires_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  cart_item_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type InventoryReservationUncheckedUpdateManyWithoutVariant_syncInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   expires_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  cart_item_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -460,7 +572,9 @@ export type InventoryReservationSelect<ExtArgs extends runtime.Types.Extensions.
   variant_id?: boolean
   quantity?: boolean
   expires_at?: boolean
+  cart_item_id?: boolean
   variant_sync?: boolean | Prisma.ProductVariantDefaultArgs<ExtArgs>
+  cart_item_sync?: boolean | Prisma.InventoryReservation$cart_item_syncArgs<ExtArgs>
 }, ExtArgs["result"]["inventoryReservation"]>
 
 export type InventoryReservationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -468,7 +582,9 @@ export type InventoryReservationSelectCreateManyAndReturn<ExtArgs extends runtim
   variant_id?: boolean
   quantity?: boolean
   expires_at?: boolean
+  cart_item_id?: boolean
   variant_sync?: boolean | Prisma.ProductVariantDefaultArgs<ExtArgs>
+  cart_item_sync?: boolean | Prisma.InventoryReservation$cart_item_syncArgs<ExtArgs>
 }, ExtArgs["result"]["inventoryReservation"]>
 
 export type InventoryReservationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -476,7 +592,9 @@ export type InventoryReservationSelectUpdateManyAndReturn<ExtArgs extends runtim
   variant_id?: boolean
   quantity?: boolean
   expires_at?: boolean
+  cart_item_id?: boolean
   variant_sync?: boolean | Prisma.ProductVariantDefaultArgs<ExtArgs>
+  cart_item_sync?: boolean | Prisma.InventoryReservation$cart_item_syncArgs<ExtArgs>
 }, ExtArgs["result"]["inventoryReservation"]>
 
 export type InventoryReservationSelectScalar = {
@@ -484,29 +602,35 @@ export type InventoryReservationSelectScalar = {
   variant_id?: boolean
   quantity?: boolean
   expires_at?: boolean
+  cart_item_id?: boolean
 }
 
-export type InventoryReservationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "variant_id" | "quantity" | "expires_at", ExtArgs["result"]["inventoryReservation"]>
+export type InventoryReservationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "variant_id" | "quantity" | "expires_at" | "cart_item_id", ExtArgs["result"]["inventoryReservation"]>
 export type InventoryReservationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   variant_sync?: boolean | Prisma.ProductVariantDefaultArgs<ExtArgs>
+  cart_item_sync?: boolean | Prisma.InventoryReservation$cart_item_syncArgs<ExtArgs>
 }
 export type InventoryReservationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   variant_sync?: boolean | Prisma.ProductVariantDefaultArgs<ExtArgs>
+  cart_item_sync?: boolean | Prisma.InventoryReservation$cart_item_syncArgs<ExtArgs>
 }
 export type InventoryReservationIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   variant_sync?: boolean | Prisma.ProductVariantDefaultArgs<ExtArgs>
+  cart_item_sync?: boolean | Prisma.InventoryReservation$cart_item_syncArgs<ExtArgs>
 }
 
 export type $InventoryReservationPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "InventoryReservation"
   objects: {
     variant_sync: Prisma.$ProductVariantPayload<ExtArgs>
+    cart_item_sync: Prisma.$CartItemPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     variant_id: string
     quantity: number
     expires_at: Date
+    cart_item_id: string | null
   }, ExtArgs["result"]["inventoryReservation"]>
   composites: {}
 }
@@ -902,6 +1026,7 @@ readonly fields: InventoryReservationFieldRefs;
 export interface Prisma__InventoryReservationClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   variant_sync<T extends Prisma.ProductVariantDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProductVariantDefaultArgs<ExtArgs>>): Prisma.Prisma__ProductVariantClient<runtime.Types.Result.GetResult<Prisma.$ProductVariantPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  cart_item_sync<T extends Prisma.InventoryReservation$cart_item_syncArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.InventoryReservation$cart_item_syncArgs<ExtArgs>>): Prisma.Prisma__CartItemClient<runtime.Types.Result.GetResult<Prisma.$CartItemPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -935,6 +1060,7 @@ export interface InventoryReservationFieldRefs {
   readonly variant_id: Prisma.FieldRef<"InventoryReservation", 'String'>
   readonly quantity: Prisma.FieldRef<"InventoryReservation", 'Int'>
   readonly expires_at: Prisma.FieldRef<"InventoryReservation", 'DateTime'>
+  readonly cart_item_id: Prisma.FieldRef<"InventoryReservation", 'String'>
 }
     
 
@@ -1333,6 +1459,25 @@ export type InventoryReservationDeleteManyArgs<ExtArgs extends runtime.Types.Ext
    * Limit how many InventoryReservations to delete.
    */
   limit?: number
+}
+
+/**
+ * InventoryReservation.cart_item_sync
+ */
+export type InventoryReservation$cart_item_syncArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CartItem
+   */
+  select?: Prisma.CartItemSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CartItem
+   */
+  omit?: Prisma.CartItemOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CartItemInclude<ExtArgs> | null
+  where?: Prisma.CartItemWhereInput
 }
 
 /**

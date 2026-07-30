@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -19,18 +20,18 @@ function UniversalBreadcrum({ labels, className }: UniversalBreadcrumProps) {
         {labels.map((label, i) => {
           const isLast = i === labels.length - 1;
           return (
-            <BreadcrumbItem key={i}>
-              {isLast ? (
-                <BreadcrumbPage className="capitalize">{label}</BreadcrumbPage>
-              ) : (
-                <>
+            <React.Fragment key={i}>
+              <BreadcrumbItem>
+                {isLast ? (
+                  <BreadcrumbPage className="capitalize">{label}</BreadcrumbPage>
+                ) : (
                   <BreadcrumbLink href="#" className="capitalize">
                     {label}
                   </BreadcrumbLink>
-                  <BreadcrumbSeparator />
-                </>
-              )}
-            </BreadcrumbItem>
+                )}
+              </BreadcrumbItem>
+              {!isLast && <BreadcrumbSeparator />}
+            </React.Fragment>
           );
         })}
       </BreadcrumbList>

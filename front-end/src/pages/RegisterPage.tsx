@@ -20,7 +20,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import publicAPI from "@/services/api/publicApi";
 import { useStore } from "@/stores/store";
 import { useMutation } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Spinner } from "@/components/ui/spinner";
 import { errorHandler } from "@/services/errorHandler";
 
@@ -33,6 +33,8 @@ export function RegisterPage({ ...props }: React.ComponentProps<typeof Card>) {
   const [wait, setWait] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = (location.state as { from?: string } | null)?.from ?? "/";
 
   function popUp(): void {
     setMes(true);
@@ -61,7 +63,7 @@ export function RegisterPage({ ...props }: React.ComponentProps<typeof Card>) {
       const { setName, setAccessToken } = useStore.getState();
       setName(data.name);
       setAccessToken(data.accessToken);
-      navigate("/");
+      navigate(from);
     },
     onError: () => {
       waitTime();
@@ -84,7 +86,7 @@ export function RegisterPage({ ...props }: React.ComponentProps<typeof Card>) {
     if (wait) {
       throw new Error("Wait 3 seconds and try again");
     }
-    navigate("/auth/login");
+    navigate("/auth/login", { state: { from } });
   };
 
   const handleMainPage = async (e: React.MouseEvent<HTMLButtonElement>) => {
