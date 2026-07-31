@@ -58,10 +58,7 @@ export function AppSidebar({
     queryKey: ["categories"],
     queryFn: async () => {
       const response = await publicAPI.get("/catalog/category");
-      const results: { id: string; name: string }[] =
-        response.data?.results ?? setActiveCategory(defaultCategory.title);
-      onCategoryChange?.(defaultCategory.title);
-      setCategory(defaultCategory.title);
+      const results: { id: string; name: string }[] = response.data?.results ?? [];
       return results.map((cat) => ({
         title: cat.name,
         url: "#",

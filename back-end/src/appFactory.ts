@@ -11,6 +11,7 @@ import { requestLogger } from './common/utils/logmiddleware.js';
 import pingRoutes from './modules/health/routes.js';
 import userRoutes from './modules/auth/routes.js';
 import productsRoutes from './modules/catalog/products/routes.js';
+import categoryRoutes from './modules/catalog/category/routes.js';
 import { variantsRoutes } from './modules/catalog/variants/routes.js';
 import cartRoutes from './modules/cart/routes.js';
 import checkoutRoutes from './modules/checkout/routes.js';
@@ -109,6 +110,7 @@ export function createApp(): Express {
   app.use('/ping', pingRoutes);
   app.use('/auth', userRoutes);
   app.use('/products', productsRoutes);
+  app.use('/catalog/category', categoryRoutes);
   app.use('/variants', variantsRoutes);
   app.use('/cart', cartRoutes);
   app.use('/checkout', checkoutRoutes);
