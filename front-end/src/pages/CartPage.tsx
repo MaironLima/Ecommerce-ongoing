@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Plus, Minus, Trash2 } from "lucide-react";
+import { Plus, Minus, Trash2, Package } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import UniversalBreadcrum from "@/components/UniversalBreadcrum";
 import { useCartStore } from "@/stores/cartStore";
@@ -95,7 +95,7 @@ function CartPage() {
       <div className="min-h-svh flex flex-col bg-background">
         
         <div className="flex-1 flex items-center justify-center">
-          <div className="global-card border-destructive/30 bg-destructive/10 text-destructive-foreground">
+          <div className="global-card-error">
             Please log in to view your cart.
           </div>
         </div>
@@ -119,7 +119,7 @@ function CartPage() {
       <div className="min-h-svh flex flex-col bg-background">
         
         <div className="flex-1 flex items-center justify-center">
-          <div className="global-card border-destructive/30 bg-destructive/10 text-destructive-foreground">
+          <div className="global-card-error">
             {error}
           </div>
         </div>
@@ -152,7 +152,7 @@ function CartPage() {
   return (
     <div className="min-h-svh flex flex-col bg-background">
       <div className="w-full max-w-7xl mx-auto px-6 p-4">
-        <UniversalBreadcrum labels={["Cart", "Choose Products"]} />
+        <UniversalBreadcrum labels={[{ label: "Cart", to: "/" }, "Choose Products"]} />
       </div>
       <div className="flex-1 w-full max-w-7xl mx-auto px-6 pb-6 grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         <div className="lg:col-span-2 flex flex-col gap-3">
@@ -199,13 +199,18 @@ function CartPage() {
 
                 <div className="flex flex-col min-w-0 flex-1 gap-1 text-sm">
                   {title && (
-                    <span className="font-medium text-foreground">{title}</span>
+                    <span
+                      className="font-medium text-foreground line-clamp-2 break-words"
+                      title={title}
+                    >
+                      {title}
+                    </span>
                   )}
                   {attrsLabel && (
                     <span className="text-muted-foreground">{attrsLabel}</span>
                   )}
                   <span className="text-foreground font-medium">
-                    R$ {item.unit_price_snapshot.toFixed(2)}
+                    $ {item.unit_price_snapshot.toFixed(2)}
                   </span>
                   <p
                     className={
@@ -265,7 +270,7 @@ function CartPage() {
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Total</span>
             <span className="text-2xl font-bold text-primary">
-              R$ {total.toFixed(2)}
+              $ {total.toFixed(2)}
             </span>
           </div>
           <button
@@ -275,6 +280,13 @@ function CartPage() {
             title="Proceed to checkout"
           >
             Checkout
+          </button>
+          <button
+            className="global-btn bg-secondary text-secondary-foreground flex items-center justify-center gap-2"
+            onClick={() => navigate("/orders")}
+            title="View your orders"
+          >
+            <Package size={16} /> My orders
           </button>
           <button
             className="global-btn bg-secondary text-secondary-foreground flex items-center justify-center gap-2"

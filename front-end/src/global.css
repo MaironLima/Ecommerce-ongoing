@@ -107,6 +107,10 @@ html, body {
         @apply p-4 rounded-2xl border bg-card text-card-foreground shadow-sm font-sans;
     }
 
+    .global-card-error {
+        @apply p-4 rounded-2xl border border-destructive/30 bg-destructive/10 text-foreground shadow-sm font-sans;
+    }
+
     .global-card-hover {
         @apply transition-shadow;
         box-shadow: 0 4px 24px rgba(0, 0, 0, 0.17);

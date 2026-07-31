@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
-import { ArrowLeft, Package } from "lucide-react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { ArrowLeft, Package, CreditCard, Loader2 } from "lucide-react";
 import UniversalBreadcrum from "@/components/UniversalBreadcrum";
 import { useStore } from "@/stores/store";
 import type { AxiosError } from "axios";
 import publicAPI from "@/services/api/publicApi";
+import privateAPI from "@/services/api/privateApi";
 
 type OrderStatus = "PENDING" | "PAID" | "FAILED" | "CANCELLED" | "REFUNDED";
 
 interface OrderItem {
   id: string;
+  cart_item_id: string | null;
   variant_id: string;
   quantity: number;
   unit_price_snapshot: number;
@@ -38,11 +40,13 @@ const ORDER_STATUS_STYLES: Record<OrderStatus, string> = {
 
 function OrdersPage() {
   const accessToken = useStore((s) => s.accessToken);
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const paidId = searchParams.get("paid");
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [resumingId, setResumingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!accessToken) return;
@@ -68,7 +72,7 @@ function OrdersPage() {
   return (
     <div className="min-h-svh flex flex-col bg-background">
       <div className="w-full max-w-7xl mx-auto px-6 p-4">
-        <UniversalBreadcrum labels={["Orders", "Status"]} />
+        <UniversalBreadcrum labels={[{ label: "Cart", to: "/cart" }, "Orders"]} />
       </div>
       <div className="flex-1 w-full max-w-7xl mx-auto px-6 pb-6 flex flex-col gap-4">
         {paidId && (
@@ -78,7 +82,7 @@ function OrdersPage() {
         )}
 
         {!accessToken && (
-          <div className="global-card border-destructive/30 bg-destructive/10 text-destructive-foreground">
+          <div className="global-card-error">
             Please log in to view your orders.
           </div>
         )}
@@ -88,7 +92,7 @@ function OrdersPage() {
           </div>
         )}
         {error && (
-          <div className="global-card border-destructive/30 bg-destructive/10 text-destructive-foreground">
+          <div className="global-card-error">
             {error}
           </div>
         )}
@@ -144,7 +148,7 @@ function OrdersPage() {
                         )}
                         <div className="flex flex-col min-w-0 flex-1">
                           {title && (
-                            <span className="font-medium text-foreground">
+                            <span className="font-medium text-foreground line-clamp-2 break-words">
                               {title}
                             </span>
                           )}
@@ -158,7 +162,7 @@ function OrdersPage() {
                               quantity: {item.quantity}
                             </span>
                             <span className="text-muted-foreground">
-                              R$ {(item.unit_price_snapshot * item.quantity).toFixed(2)}
+                              $ {(item.unit_price_snapshot * item.quantity).toFixed(2)}
                             </span>
                           </div>
                         </div>
@@ -170,9 +174,43 @@ function OrdersPage() {
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">Total</span>
                   <span className="text-xl font-bold text-primary">
-                    R$ {Number(order.total).toFixed(2)}
+                    $ {Number(order.total).toFixed(2)}
                   </span>
                 </div>
+
+                {order.status === "PENDING" && (
+                  <button
+                    className="global-btn flex items-center justify-center gap-2 w-fit disabled:opacity-50"
+                    disabled={resumingId === order.id}
+                    onClick={async () => {
+                      setResumingId(order.id);
+                      try {
+                        const { data } = await privateAPI.post<{ cart_item_ids: string[] }>(
+                          `/orders/${order.id}/resume`,
+                        );
+                        navigate("/checkout", { state: { cartItemIds: data.cart_item_ids } });
+                      } catch (e) {
+                        const err = e as AxiosError<{ error?: string }>;
+                        setResumingId(null);
+                        setError(
+                          err?.response?.data?.error ??
+                            "Failed to resume checkout. Please try again.",
+                        );
+                      }
+                    }}
+                    title="Resume checkout for this order"
+                  >
+                    {resumingId === order.id ? (
+                      <>
+                        <Loader2 size={16} className="animate-spin" /> Resuming...
+                      </>
+                    ) : (
+                      <>
+                        <CreditCard size={16} /> Resume checkout
+                      </>
+                    )}
+                  </button>
+                )}
               </div>
             ))}
           </div>

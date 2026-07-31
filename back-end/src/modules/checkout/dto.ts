@@ -2,7 +2,7 @@ import * as z from 'zod';
 
 export const checkoutCreateSchema = z.object({
   shipping_address: z.record(z.string(), z.any()).optional(),
-  currency: z.string().length(3).default('brl'),
+  currency: z.string().length(3).default('usd'),
   cart_item_ids: z.array(z.string().uuid()).optional(),
 });
 

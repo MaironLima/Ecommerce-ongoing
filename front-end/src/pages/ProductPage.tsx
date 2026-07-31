@@ -109,10 +109,12 @@ function ProductPage() {
 
   if (isLoadingProduct || isLoadingVariants)
     return (
-      <div className="min-h-svh flex items-center justify-center bg-background">
+      <div className="min-h-svh flex flex-col bg-background">
         <Header />
-        <div className="global-card animate-pulse text-muted-foreground">
-          Loading product...
+        <div className="flex-1 flex items-center justify-center">
+          <div className="global-card animate-pulse text-muted-foreground">
+            Loading product...
+          </div>
         </div>
       </div>
     );
@@ -121,7 +123,7 @@ function ProductPage() {
       <div className="min-h-svh flex flex-col bg-background">
         <Header />
         <div className="flex-1 flex items-center justify-center">
-          <div className="global-card text-destructive-foreground bg-destructive/10 border-destructive/30">
+          <div className="global-card-error">
             Product not found.
           </div>
         </div>
@@ -132,7 +134,7 @@ function ProductPage() {
       <div className="min-h-svh flex flex-col bg-background">
         <Header />
         <div className="flex-1 flex items-center justify-center">
-          <div className="global-card text-destructive-foreground bg-destructive/10 border-destructive/30">
+          <div className="global-card-error">
             Variants not found.
           </div>
         </div>
@@ -147,7 +149,9 @@ function ProductPage() {
           labels={[
             "Products",
             ...Array.from(new Set(product.product_category)),
-            product.title,
+            product.title.length > 40
+              ? product.title.slice(0, 37) + "..."
+              : product.title,
           ]}
         />
       </div>
@@ -201,7 +205,7 @@ function ProductPage() {
 
         <div className="flex flex-col gap-5 bg-muted/50 global-card">
           <div>
-            <h1 className="text-3xl font-bold text-foreground capitalize">
+            <h1 className="text-3xl font-bold text-foreground capitalize line-clamp-2 break-words">
               {product.title}
             </h1>
             <div className="mt-2 flex flex-wrap gap-2">
@@ -224,7 +228,7 @@ function ProductPage() {
 
           <div className="flex items-center justify-between border-t border-border pt-4">
             <h3 className="text-2xl font-semibold text-primary">
-              R$ {activeVariant?.priceOverride ?? product.base_price}
+              $ {activeVariant?.priceOverride ?? product.base_price}
             </h3>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">

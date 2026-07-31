@@ -30,7 +30,7 @@ test.describe("E-commerce E2E", () => {
 
     await expect(page.getByRole("img", { name: "Logo" }).first()).toBeVisible();
     await expect(page.getByText(FAKE_PRODUCT.title).first()).toBeVisible({ timeout: 10_000 });
-    await expect(page.getByText(`R$ ${FAKE_PRODUCT.base_price}`).first()).toBeVisible();
+    await expect(page.getByText(`$ ${FAKE_PRODUCT.base_price}`).first()).toBeVisible();
   });
 
   test("login page shows error alert on failed login", async ({ page }) => {

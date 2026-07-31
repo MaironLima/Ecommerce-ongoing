@@ -107,7 +107,7 @@ export default function Page() {
                       {post.title}
                     </span>
                     <span className="font-semibold mt-auto text-[16px] self-start">
-                      R$ {post.base_price}
+                      $ {post.base_price}
                     </span>
                   </div>
                 ))

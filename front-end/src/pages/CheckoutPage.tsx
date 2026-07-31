@@ -6,8 +6,9 @@ import {
   useElements,
   useStripe,
 } from "@stripe/react-stripe-js";
+import { useQuery } from "@tanstack/react-query";
+import type { AxiosError } from "axios";
 import { ArrowLeft, Loader2 } from "lucide-react";
-import Header from "@/components/Header";
 import UniversalBreadcrum from "@/components/UniversalBreadcrum";
 import privateAPI from "@/services/api/privateApi";
 import { getStripe } from "@/services/api/stripe";
@@ -30,20 +31,24 @@ interface OrderStatusResponse {
 }
 
 const POLL_INTERVAL_MS = 1500;
-const POLL_TIMEOUT_MS = 30000;
+const POLL_TIMEOUT_MS = 60000;
 
 function CheckoutForm({
   orderId,
   total,
+  onSessionStale,
 }: {
   orderId: string;
   total: number;
+  onSessionStale: () => void;
 }) {
   const stripe = useStripe();
   const elements = useElements();
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [ready, setReady] = useState(false);
+  const [loadError, setLoadError] = useState(false);
 
   const pollOrderStatus = async () => {
     const deadline = Date.now() + POLL_TIMEOUT_MS;
@@ -74,9 +79,20 @@ function CheckoutForm({
     setSubmitting(false);
   };
 
+  useEffect(() => {
+    if (ready) return;
+    const t = setTimeout(() => {
+      if (!ready) setLoadError(true);
+    }, 8000);
+    return () => clearTimeout(t);
+  }, [ready]);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!stripe || !elements) return;
+    if (!stripe || !elements || !ready) {
+      setMessage("Payment form is still loading. Please wait a moment.");
+      return;
+    }
 
     setSubmitting(true);
     setMessage(null);
@@ -93,21 +109,57 @@ function CheckoutForm({
     }
 
     if (paymentIntent && paymentIntent.status === "succeeded") {
+      try {
+        const { data } = await privateAPI.post<OrderStatusResponse>(
+          `/checkout/${orderId}/confirm`,
+        );
+        if (data.status === "PAID") {
+          navigate(`/orders?paid=${orderId}`);
+          return;
+        }
+      } catch {
+        // fall back to polling if the confirm call fails
+      }
       await pollOrderStatus();
+    } else if (paymentIntent && paymentIntent.status === "processing") {
+      setMessage("Payment is still processing. Redirecting...");
+      await pollOrderStatus();
+    } else if (paymentIntent && paymentIntent.status === "requires_action") {
+      setMessage("Additional authentication required. Please retry with the same card.");
+      setSubmitting(false);
+      onSessionStale();
     } else if (paymentIntent) {
       setMessage(
         `Payment status: ${paymentIntent.status}. You can check your orders page.`,
       );
       setSubmitting(false);
+      onSessionStale();
     }
   };
 
+  if (loadError) {
+    return (
+      <div className="flex flex-col gap-3 items-center text-center">
+        <p className="text-sm text-destructive" role="alert">
+          The payment form failed to load. Refreshing your checkout session...
+        </p>
+        <button
+          type="button"
+          className="global-btn flex items-center justify-center gap-2"
+          onClick={onSessionStale}
+        >
+          <Loader2 size={16} className="animate-spin" /> Try again
+        </button>
+      </div>
+    );
+  }
+
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <PaymentElement />
+      <PaymentElement onReady={() => setReady(true)} />
       <button
         type="submit"
-        disabled={!stripe || submitting}
+        disabled={!stripe || !ready || submitting}
         className="global-btn flex items-center justify-center gap-2 disabled:opacity-50"
       >
         {submitting ? (
@@ -115,15 +167,14 @@ function CheckoutForm({
             <Loader2 size={16} className="animate-spin" /> Processing...
           </>
         ) : (
-          `Pay R$ ${total.toFixed(2)}`
+          `Pay $${total.toFixed(2)}`
         )}
       </button>
       {message && (
         <p
           className={
             "text-sm " +
-            (message.toLowerCase().includes("succeed") ||
-            message.toLowerCase().includes("check")
+            (message.toLowerCase().includes("succeed")
               ? "text-primary"
               : "text-destructive")
           }
@@ -145,66 +196,59 @@ function CheckoutPage() {
 
   const cartItemIds = (location.state as { cartItemIds?: string[] } | null)?.cartItemIds;
 
-  const [session, setSession] = useState<CheckoutSessionResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!accessToken) {
-      setError("Please log in to checkout.");
-      setLoading(false);
-      return;
-    }
-    void (async () => {
-      try {
-        await fetchCart();
-        const cartNow = useCartStore.getState().items;
-        if (cartNow.length === 0) {
-          setError("Your cart is empty.");
-          setLoading(false);
-          return;
-        }
-        if (cartItemIds && cartItemIds.length === 0) {
-          setError("No items selected. Please select items to checkout.");
-          setLoading(false);
-          return;
-        }
-        const validIds = cartItemIds
-          ? cartItemIds.filter((id) => cartNow.some((i) => i.id === id))
-          : null;
-        if (cartItemIds && validIds && validIds.length === 0) {
-          setError("Selected items are no longer in your cart.");
-          setLoading(false);
-          return;
-        }
-        const { data } = await privateAPI.post<CheckoutSessionResponse>(
-          "/checkout/session",
-          { currency: "brl", ...(validIds ? { cart_item_ids: validIds } : {}) },
-        );
-        setSession(data);
-        setLoading(false);
-      } catch (e: any) {
-        setError(
-          e?.response?.data?.error ?? "Failed to start checkout. Please retry.",
-        );
-        setLoading(false);
+  const { data: session, isLoading, error, refetch } = useQuery<CheckoutSessionResponse>({
+    queryKey: ["checkout-session", accessToken, cartItemIds],
+    enabled: !!accessToken,
+    queryFn: async () => {
+      await fetchCart();
+      const cartNow = useCartStore.getState().items;
+      if (cartNow.length === 0) {
+        throw new Error("Your cart is empty.");
       }
-    })();
-  }, [accessToken, fetchCart, cartItemIds]);
+      if (cartItemIds && cartItemIds.length === 0) {
+        throw new Error("No items selected. Please select items to checkout.");
+      }
+      const validIds = cartItemIds
+        ? cartItemIds.filter((id) => cartNow.some((i) => i.id === id))
+        : null;
+      if (cartItemIds && validIds && validIds.length === 0) {
+        throw new Error("Selected items are no longer in your cart.");
+      }
+      const { data } = await privateAPI.post<CheckoutSessionResponse>(
+        "/checkout/session",
+        { currency: "usd", ...(validIds ? { cart_item_ids: validIds } : {}) },
+      );
+      return data;
+    },
+    retry: false,
+  });
 
   const stripePromise = useMemo(() => getStripe(), []);
   const total = session ? Number(session.total) : 0;
-  const currency = session?.currency ?? "brl";
+  const currency = session?.currency ?? "usd";
+  const options = session?.client_secret
+    ? { clientSecret: session.client_secret, locale: "en" as const }
+    : null;
 
-  const options = useMemo(
-    () => (session?.client_secret ? { clientSecret: session.client_secret } : null),
-    [session?.client_secret],
-  );
+  const axiosErr = error as AxiosError<{ error?: string; code?: string }> | null;
+  const errorCode = axiosErr?.response?.data?.code ?? axiosErr?.response?.data?.error;
 
-  if (loading) {
+  // Already-paid cart → redirect to orders instead of showing an inline error.
+  useEffect(() => {
+    if (errorCode === "ORDER_ALREADY_PAID") {
+      navigate("/orders");
+    }
+  }, [errorCode, navigate]);
+
+  const errorMessage =
+    !accessToken
+      ? "Please log in to checkout."
+      : axiosErr?.response?.data?.error ?? error?.message ??
+        "Failed to start checkout. Please retry.";
+
+  if (isLoading) {
     return (
       <div className="min-h-svh flex flex-col bg-background">
-        <Header />
         <div className="flex-1 flex items-center justify-center">
           <div className="global-card animate-pulse text-muted-foreground">
             Preparing checkout...
@@ -217,13 +261,12 @@ function CheckoutPage() {
   if (error || !session || !options) {
     return (
       <div className="min-h-svh flex flex-col bg-background">
-        <Header />
         <div className="w-full max-w-7xl mx-auto px-6 pt-4">
           <UniversalBreadcrum labels={["Checkout"]} />
         </div>
         <div className="flex-1 flex flex-col items-center justify-center gap-4">
-          <div className="global-card border-destructive/30 bg-destructive/10 text-destructive-foreground">
-            {error ?? "Unable to start checkout"}
+          <div className="global-card-error">
+            {errorMessage}
           </div>
           <button
             className="global-btn bg-secondary text-secondary-foreground flex items-center gap-2"
@@ -241,9 +284,8 @@ function CheckoutPage() {
 
   return (
     <div className="min-h-svh flex flex-col bg-background">
-      <Header />
       <div className="w-full max-w-7xl mx-auto px-6 pt-4">
-        <UniversalBreadcrum labels={["Cart", "Checkout"]} />
+        <UniversalBreadcrum labels={[{ label: "Cart", to: "/cart" }, "Checkout"]} />
       </div>
       <div className="flex-1 w-full max-w-3xl mx-auto px-6 pb-6 grid grid-cols-1 gap-6 items-start">
         <div className="global-card flex flex-col gap-4">
@@ -257,14 +299,22 @@ function CheckoutPage() {
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Total</span>
             <span className="text-2xl font-bold text-primary">
-              R$ {total.toFixed(2)} {currency.toUpperCase()}
+              ${total.toFixed(2)} {currency.toUpperCase()}
             </span>
           </div>
         </div>
 
         <div className="global-card">
-          <Elements stripe={stripePromise} options={options}>
-            <CheckoutForm orderId={session.order_id} total={total} />
+          <Elements
+            key={session.client_secret}
+            stripe={stripePromise}
+            options={options}
+          >
+            <CheckoutForm
+              orderId={session.order_id}
+              total={total}
+              onSessionStale={refetch}
+            />
           </Elements>
         </div>
 

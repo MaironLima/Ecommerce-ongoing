@@ -1,7 +1,5 @@
 import { Request, Response } from 'express';
-import {
-  categoriesService,
-} from './services';
+import { categoriesService } from './services.js';
 
 export const categoriesController = async (_req: Request, res: Response) => {
   try {
@@ -11,4 +9,3 @@ export const categoriesController = async (_req: Request, res: Response) => {
     res.status(400).json({ error: e.message || 'Error listing categories' });
   }
 };
-

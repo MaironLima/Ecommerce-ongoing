@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { HttpError, unauthenticated } from '../../common/utils/errors.js';
-import { createCheckoutSessionService, getCheckoutStatusService } from './services.js';
+import { createCheckoutSessionService, getCheckoutStatusService, confirmCheckoutService } from './services.js';
 import { checkoutCreateSchema } from './dto.js';
 
 function getUserId(userId: string | undefined): string {
@@ -41,6 +41,21 @@ export const checkoutStatusController = async (req: Request, res: Response) => {
     if (!orderId) throw new HttpError(400, 'orderId is required', 'INVALID_PARAM');
 
     const result = await getCheckoutStatusService(userId, orderId);
+
+    res.status(200).json(result);
+  } catch (e: any) {
+    handleError(res, e);
+  }
+};
+
+export const checkoutConfirmController = async (req: Request, res: Response) => {
+  try {
+    const userId = getUserId((req as any).user?.userId);
+    const orderId = req.params.orderId;
+
+    if (!orderId) throw new HttpError(400, 'orderId is required', 'INVALID_PARAM');
+
+    const result = await confirmCheckoutService(userId, orderId);
 
     res.status(200).json(result);
   } catch (e: any) {

@@ -12,7 +12,7 @@ let stripePromise: Promise<Stripe | null> | null = null;
 
 export function getStripe(): Promise<Stripe | null> {
   if (!stripePromise) {
-    stripePromise = loadStripe(publishableKey ?? "");
+    stripePromise = loadStripe(publishableKey ?? "", { locale: "en" });
   }
   return stripePromise;
 }
