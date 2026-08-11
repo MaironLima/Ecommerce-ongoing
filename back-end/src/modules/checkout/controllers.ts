@@ -1,7 +1,12 @@
 import { Request, Response } from 'express';
 import { HttpError, unauthenticated } from '../../common/utils/errors.js';
-import { createCheckoutSessionService, getCheckoutStatusService, confirmCheckoutService } from './services.js';
+import {
+  createCheckoutSessionService,
+  getCheckoutStatusService,
+  confirmCheckoutService,
+} from './services.js';
 import { checkoutCreateSchema } from './dto.js';
+import jwt from 'jsonwebtoken';
 
 function getUserId(userId: string | undefined): string {
   if (!userId) throw unauthenticated();

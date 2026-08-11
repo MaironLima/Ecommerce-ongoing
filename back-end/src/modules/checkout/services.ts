@@ -2,6 +2,8 @@ import { prisma } from '../../libs/prisma.js';
 import { stripe } from '../../libs/stripe.js';
 import { HttpError } from '../../common/utils/errors.js';
 import type Stripe from 'stripe';
+import nodemailer from 'nodemailer';
+import { MAIL_PASSWORD, MAIL_USER } from '../../config/env.js';
 
 const RESERVATION_TTL_MS = 15 * 60 * 1000;
 
@@ -10,7 +12,7 @@ function reservationExpiry(from: Date = new Date()): Date {
 }
 
 async function finalizeOrderAsPaid(orderId: string) {
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async tx => {
     const order = await tx.order.findUnique({
       where: { id: orderId },
       include: { order_item: { select: { id: true, cart_item_id: true } } },
@@ -18,7 +20,7 @@ async function finalizeOrderAsPaid(orderId: string) {
     if (!order || order.status === 'PAID') return;
 
     const cartItemIds = order.order_item
-      .map((item) => item.cart_item_id)
+      .map(item => item.cart_item_id)
       .filter((id): id is string => Boolean(id));
 
     if (cartItemIds.length > 0) {
@@ -60,14 +62,14 @@ export async function createCheckoutSessionService(
   }
 
   const selectedItems = cartItemIds
-    ? cart.cart_item.filter((item) => cartItemIds.includes(item.id))
+    ? cart.cart_item.filter(item => cartItemIds.includes(item.id))
     : cart.cart_item;
 
   if (selectedItems.length === 0) {
     throw new HttpError(400, 'No cart items selected', 'NO_SELECTED_ITEMS');
   }
 
-  const selectedCartItemIds = selectedItems.map((item) => item.id);
+  const selectedCartItemIds = selectedItems.map(item => item.id);
 
   // Idempotency: on a page refresh React Query re-fires the checkout request.
   // Reuse an existing PENDING order that already covers the same cart items
@@ -140,7 +142,7 @@ export async function createCheckoutSessionService(
   }
 
   const now = new Date();
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async tx => {
     for (const item of selectedItems) {
       const loaded = item.inventory_reservation;
       if (loaded && loaded.expires_at > now) {
@@ -198,6 +200,8 @@ export async function createCheckoutSessionService(
   }
 
   let orderId: string;
+  let orderCopy;
+
   if (reuseOrderId) {
     orderId = reuseOrderId;
     await prisma.order.update({
@@ -213,7 +217,7 @@ export async function createCheckoutSessionService(
         currency,
         ...(shippingAddress ? { shipping_address: shippingAddress as object } : {}),
         order_item: {
-          create: selectedItems.map((item) => ({
+          create: selectedItems.map(item => ({
             variant_id: item.variant_id,
             cart_item_id: item.id,
             quantity: item.quantity,
@@ -225,6 +229,7 @@ export async function createCheckoutSessionService(
       },
     });
     orderId = order.id;
+    orderCopy = order;
   }
 
   let paymentIntent: Stripe.PaymentIntent;
@@ -251,6 +256,42 @@ export async function createCheckoutSessionService(
     },
   });
 
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+  });
+
+  if (user?.email && orderCopy?.status === 'PENDING') {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: MAIL_USER,
+        pass: MAIL_PASSWORD,
+      },
+    });
+
+    await transporter.sendMail({
+      from: 'E-commerce <no-reply@yourapp.com>',
+      to: user?.email,
+      subject: 'Checkout Order Registered Successfully',
+      text: `Hello ${user?.name}, 
+
+      Your checkout order has been successfully registered. 
+
+      Order ID: ${orderCopy?.id} 
+      Order Date: ${orderCopy?.created_at}  
+      Total Amount: $ ${orderCopy?.total}
+      
+      We have received your order and it is now being processed. 
+      
+      If you did not place this order, please contact our support team immediately. 
+      
+      Thank you for choosing Super E-commerce. 
+      Best regards, Super E-commerce Team`,
+    });
+  }
+
   return {
     order_id: orderId,
     client_secret: paymentIntent.client_secret,
@@ -258,45 +299,6 @@ export async function createCheckoutSessionService(
     total,
     currency,
   };
-}
-
-export async function confirmCheckoutService(userId: string, orderId: string) {
-  const order = await prisma.order.findFirst({
-    where: { id: orderId, user_id: userId },
-    select: {
-      id: true,
-      status: true,
-      total: true,
-      currency: true,
-      stripe_payment_intent_id: true,
-    },
-  });
-
-  if (!order) throw new HttpError(404, 'Order not found', 'ORDER_NOT_FOUND');
-  if (order.status === 'PAID') return { ...order, status: 'PAID' as const };
-  if (order.status !== 'PENDING') {
-    throw new HttpError(409, `Order is ${order.status}, cannot confirm`, 'INVALID_STATUS');
-  }
-  if (!order.stripe_payment_intent_id || !stripe) {
-    throw new HttpError(400, 'Order has no active payment intent', 'NO_PAYMENT_INTENT');
-  }
-
-  const intent = await stripe.paymentIntents.retrieve(order.stripe_payment_intent_id);
-
-  if (intent.status === 'succeeded') {
-    await finalizeOrderAsPaid(order.id);
-    return { ...order, status: 'PAID' as const };
-  }
-
-  if (intent.status === 'canceled') {
-    await prisma.order.update({
-      where: { id: order.id },
-      data: { status: 'CANCELLED' },
-    });
-    return { ...order, status: 'CANCELLED' as const };
-  }
-
-  return { ...order, status: intent.status as 'PENDING' };
 }
 
 export async function getCheckoutStatusService(userId: string, orderId: string) {
@@ -341,3 +343,78 @@ export async function getCheckoutStatusService(userId: string, orderId: string) 
 
   return order;
 }
+
+export async function confirmCheckoutService(userId: string, orderId: string) {
+  const order = await prisma.order.findFirst({
+    where: { id: orderId, user_id: userId },
+    select: {
+      id: true,
+      status: true,
+      total: true,
+      currency: true,
+      stripe_payment_intent_id: true,
+    },
+  });
+
+  console.log(order);
+
+  if (!order) throw new HttpError(404, 'Order not found', 'ORDER_NOT_FOUND');
+  if (order.status === 'PAID') return { ...order, status: 'PAID' as const };
+  if (order.status !== 'PENDING') {
+    throw new HttpError(409, `Order is ${order.status}, cannot confirm`, 'INVALID_STATUS');
+  }
+  if (!order.stripe_payment_intent_id || !stripe) {
+    throw new HttpError(400, 'Order has no active payment intent', 'NO_PAYMENT_INTENT');
+  }
+
+  const intent = await stripe.paymentIntents.retrieve(order.stripe_payment_intent_id);
+
+  if (intent.status === 'succeeded') {
+    const timeNow = new Date();
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: MAIL_USER,
+        pass: MAIL_PASSWORD,
+      },
+    });
+
+    await transporter.sendMail({
+      from: 'E-commerce <no-reply@yourapp.com>',
+      to: user?.email,
+      subject: 'Order Purchase Confirmed',
+      text: `Hello ${user?.name}, 
+      Your order has been successfully purchased and your payment has been confirmed. 
+      
+      Order ID: ${order?.id}
+      Purchase Date: ${timeNow}  
+      Total Amount: $ ${order?.total} 
+      Payment Method: Credit card  
+      
+      Your order is now being prepared for shipment. 
+      
+      Thank you for your purchase from Super E-commerce! 
+      Best regards, Super E-commerce Team`,
+    });
+
+    await finalizeOrderAsPaid(order.id);
+    return { ...order, status: 'PAID' as const };
+  }
+
+  if (intent.status === 'canceled') {
+    await prisma.order.update({
+      where: { id: order.id },
+      data: { status: 'CANCELLED' },
+    });
+    return { ...order, status: 'CANCELLED' as const };
+  }
+
+  return { ...order, status: intent.status as 'PENDING' };
+}
+
+

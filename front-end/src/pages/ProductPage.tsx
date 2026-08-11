@@ -147,7 +147,7 @@ function ProductPage() {
       <div className="w-full max-w-7xl mx-auto px-6 pt-4">
         <UniversalBreadcrum
           labels={[
-            "Products",
+            { label: "Products", to: "/" },
             ...Array.from(new Set(product.product_category)),
             product.title.length > 40
               ? product.title.slice(0, 37) + "..."
