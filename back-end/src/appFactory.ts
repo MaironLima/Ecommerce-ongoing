@@ -17,6 +17,7 @@ import cartRoutes from './modules/cart/routes.js';
 import checkoutRoutes from './modules/checkout/routes.js';
 import ordersRoutes from './modules/orders/routes.js';
 import stripeWebhookRoutes from './modules/webhooks/stripe/routes.js';
+import reviewRoutes from './modules/reviews/routes.js';
 
 export function createApp(): Express {
   const app = express();
@@ -110,6 +111,7 @@ export function createApp(): Express {
   app.use('/ping', pingRoutes);
   app.use('/auth', userRoutes);
   app.use('/products', productsRoutes);
+  app.use('/product', reviewRoutes);
   app.use('/catalog/category', categoryRoutes);
   app.use('/variants', variantsRoutes);
   app.use('/cart', cartRoutes);

@@ -25,7 +25,9 @@ export async function registerService(email: string, password: string, name: str
   if (!JWT_SECRET) throw new Error('The token not is defined');
   if (!REFRESH_SECRET) throw new Error('Cookies not is defined');
 
-  const accessToken = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '15m' });
+  const accessToken = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, {
+    expiresIn: '15m',
+  });
   const refreshToken = jwt.sign({ userId: user.id }, REFRESH_SECRET, { expiresIn: '1d' });
 
   return { accessToken, refreshToken };
@@ -41,24 +43,60 @@ export async function loginService(email: string, password: string) {
   if (!JWT_SECRET) throw new Error('The token not is defined');
   if (!REFRESH_SECRET) throw new Error('Cookies not is defined');
 
-  const accessToken = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '15m' });
+  const accessToken = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, {
+    expiresIn: '15m',
+  });
   const refreshToken = jwt.sign({ userId: user.id }, REFRESH_SECRET, { expiresIn: '1d' });
 
   return { accessToken, refreshToken, name: user.name };
 }
 
 export async function refreshService(refreshToken: string) {
-  if (!JWT_SECRET) throw new Error('The token not is defined');
-  if (!REFRESH_SECRET) throw new Error('Cookies not is defined');
+  if (!JWT_SECRET) {
+    throw new Error('The token is not defined');
+  }
 
-  const refreshVerify = jwt.verify(refreshToken, REFRESH_SECRET) as { userId: string };
-  if (!refreshVerify) throw new Error('Session expired');
+  if (!REFRESH_SECRET) {
+    throw new Error('Refresh secret is not defined');
+  }
 
-  const newAccessToken = jwt.sign({ userId: refreshVerify.userId }, JWT_SECRET, {
-    expiresIn: '15m',
+  const refreshVerify = jwt.verify(
+    refreshToken,
+    REFRESH_SECRET,
+  ) as { userId: string };
+
+  if (!refreshVerify?.userId) {
+    throw new Error('Session expired');
+  }
+
+  const user = await prisma.user.findUnique({
+    where: {
+      id: refreshVerify.userId,
+    },
+    select: {
+      id: true,
+      role: true,
+    },
   });
 
-  return { newAccessToken };
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  const newAccessToken = jwt.sign(
+    {
+      userId: user.id,
+      role: user.role,
+    },
+    JWT_SECRET,
+    {
+      expiresIn: '15m',
+    },
+  );
+
+  return {
+    newAccessToken,
+  };
 }
 
 export async function recoverEmailService(email: string) {
@@ -84,21 +122,20 @@ export async function recoverEmailService(email: string) {
   });
 }
 
-export async function recoverCodeService(email:string) {
+export async function recoverCodeService(email: string) {
+  const user = await prisma.user.findUnique({ where: { email: email } });
+  if (!user) throw new Error('Account is incorrect');
 
-    const user = await prisma.user.findUnique({ where: { email: email } });
-    if (!user) throw new Error('Account is incorrect');
-    
-    if (!JWT_SECRET) throw new Error('The token not is defined');
-    if (!REFRESH_SECRET) throw new Error('Cookies not is defined');
-    
-    const accessToken = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '15m' });
-    const refreshToken = jwt.sign({ userId: user.id }, REFRESH_SECRET, { expiresIn: '1d' });
-    
-    return { accessToken, refreshToken, name: user.name }
+  if (!JWT_SECRET) throw new Error('The token not is defined');
+  if (!REFRESH_SECRET) throw new Error('Cookies not is defined');
+
+  const accessToken = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '15m' });
+  const refreshToken = jwt.sign({ userId: user.id }, REFRESH_SECRET, { expiresIn: '1d' });
+
+  return { accessToken, refreshToken, name: user.name };
 }
 
-export async function recoverPasswordService(accessToken: string, newPassword:string) {
+export async function recoverPasswordService(accessToken: string, newPassword: string) {
   if (!JWT_SECRET) throw new Error('The token not is defined');
   const payload = jwt.verify(accessToken, JWT_SECRET) as { userId: string };
 
@@ -106,17 +143,16 @@ export async function recoverPasswordService(accessToken: string, newPassword:st
   if (!user) throw new Error('User not found');
 
   const passwordCheck = await bcrypt.compare(newPassword, user.password);
-  if(passwordCheck) throw new Error("Cannot be the same password as the previous one");
+  if (passwordCheck) throw new Error('Cannot be the same password as the previous one');
 
   const hashedNewPassword = await hash(newPassword, 12);
 
   await prisma.user.update({
     where: user,
     data: {
-      password: hashedNewPassword
-    }
+      password: hashedNewPassword,
+    },
   });
 
   return { name: user.name };
-
 }
