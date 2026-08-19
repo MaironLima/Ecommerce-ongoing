@@ -1,4 +1,4 @@
-import { Plus, Minus } from "lucide-react";
+import { Plus, Minus, Star } from "lucide-react";
 import type { AxiosError } from "axios";
 import publicAPI from "@/services/api/publicApi";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -9,6 +9,15 @@ import UniversalBreadcrum from "@/components/UniversalBreadcrum";
 import { useCartStore } from "@/stores/cartStore";
 import { useStore } from "@/stores/store";
 
+interface Review {
+  id: string;
+  rating: number;
+  title: string;
+  comment: string;
+  created_at: string;
+  id_sync: { name: string } | null;
+}
+
 interface Product {
   id: string;
   title: string;
@@ -17,6 +26,7 @@ interface Product {
   main_image: string;
   product_category: string[];
   extra_imagens: string[];
+  review: Review[];
 }
 
 interface Variant {
@@ -67,18 +77,31 @@ function ProductPage() {
     queryFn: async () => {
       const response = await publicAPI.get(`/products/${id}`);
       const result = response.data?.result ?? response.data;
+
       if (!result) throw new Error("Product not found");
+
       return {
         ...result,
+
         product_category: (result.product_category ?? [])
           .map(
             (pc: { category_sync?: { name?: string } }) =>
               pc.category_sync?.name,
           )
-          .filter((name: string | undefined): name is string => Boolean(name)),
+          .filter(
+            (name: string | undefined): name is string => Boolean(name),
+          ),
+
         extra_imagens: (result.extra_imagens ?? []).flatMap(
           (e: { path?: string[] }) => e.path ?? [],
         ),
+
+        review: (result.review ?? [])
+          .filter((review: Review & { moderated?: boolean }) => review.moderated !== false)
+          .sort(
+            (a: Review, b: Review) =>
+              new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+          ),
       };
     },
   });
@@ -155,8 +178,8 @@ function ProductPage() {
           ]}
         />
       </div>
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 p-6 max-w-7xl w-full mx-auto items-start">
-<div className="global-card p-3 flex flex-col items-center justify-center gap-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6 max-w-7xl w-full mx-auto">
+        <div className="global-card p-3 flex flex-col items-center justify-center gap-3">
           {images.length ? (
             <>
               <div className="flex items-center justify-center w-full">
@@ -339,10 +362,66 @@ function ProductPage() {
             <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2">
               Description
             </h2>
-            <p className="text-foreground/90 leading-relaxed whitespace-pre-line min-h-[202px]">
+            <p className="text-foreground/90 leading-relaxed whitespace-pre-line">
               {product.description}
             </p>
           </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl w-full mx-auto px-6 pb-6">
+        <div className="global-card flex flex-col gap-4">
+          <div className="border-b border-border pb-3">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              Reviews
+            </h2>
+          </div>
+
+          {product.review.length ? (
+            <div className="flex flex-col divide-y divide-border">
+              {product.review.map((review) => (
+                <div key={review.id} className="py-4 flex flex-col gap-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-foreground">
+                      {review.id_sync?.name ?? "Anonymous"}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(review.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star
+                        key={i}
+                        size={16}
+                        className={
+                          i < review.rating
+                            ? "fill-yellow-400 text-yellow-400"
+                            : "text-muted-foreground/30"
+                        }
+                      />
+                    ))}
+                  </div>
+
+                  {review.title && (
+                    <p className="font-semibold text-foreground mt-1">
+                      {review.title}
+                    </p>
+                  )}
+                  {review.comment && (
+                    <p className="text-sm text-muted-foreground leading-relaxed mt-0.5">
+                      {review.comment}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              No reviews yet.
+            </p>
+          )}
         </div>
       </div>
     </div>
