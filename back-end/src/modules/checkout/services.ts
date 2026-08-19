@@ -275,20 +275,37 @@ export async function createCheckoutSessionService(
       from: 'E-commerce <no-reply@yourapp.com>',
       to: user?.email,
       subject: 'Checkout Order Registered Successfully',
-      text: `Hello ${user?.name}, 
+      html: `
+    <p>Hello ${user?.name},</p>
 
-      Your checkout order has been successfully registered. 
+    <p>Your checkout order has been successfully registered.</p>
 
-      Order ID: ${orderCopy?.id} 
-      Order Date: ${orderCopy?.created_at}  
-      Total Amount: $ ${orderCopy?.total}
-      
-      We have received your order and it is now being processed. 
-      
-      If you did not place this order, please contact our support team immediately. 
-      
-      Thank you for choosing Super E-commerce. 
-      Best regards, Super E-commerce Team`,
+    <p>
+      <strong>Order ID:</strong> ${orderCopy?.id}<br>
+      <strong>Order Date:</strong> ${orderCopy?.created_at}<br>
+      <strong>Total Amount:</strong> $ ${orderCopy?.total}
+    </p>
+
+    <p>
+      We have received your order and it is now being processed.
+    </p>
+
+    <p>
+      <a href="http://localhost:3000/orders">
+        View your order
+      </a>
+    </p>
+
+    <p>
+      If you did not place this order, please contact our support team immediately.
+    </p>
+
+    <p>
+      Thank you for choosing Super E-commerce.<br>
+      Best regards,<br>
+      Super E-commerce Team
+    </p>
+  `,
     });
   }
 
@@ -388,18 +405,38 @@ export async function confirmCheckoutService(userId: string, orderId: string) {
       from: 'E-commerce <no-reply@yourapp.com>',
       to: user?.email,
       subject: 'Order Purchase Confirmed',
-      text: `Hello ${user?.name}, 
-      Your order has been successfully purchased and your payment has been confirmed. 
-      
-      Order ID: ${order?.id}
-      Purchase Date: ${timeNow}  
-      Total Amount: $ ${order?.total} 
-      Payment Method: Credit card  
-      
-      Your order is now being prepared for shipment. 
-      
-      Thank you for your purchase from Super E-commerce! 
-      Best regards, Super E-commerce Team`,
+      html: `
+    <p>Hello ${user?.name},</p>
+
+    <p>
+      Your order has been successfully purchased and your payment has been confirmed.
+    </p>
+
+    <p>
+      <strong>Order ID:</strong> ${order?.id}<br>
+      <strong>Purchase Date:</strong> ${timeNow}<br>
+      <strong>Total Amount:</strong> $ ${order?.total}<br>
+      <strong>Payment Method:</strong> Credit card
+    </p>
+
+    <p>
+      Your order is now being prepared for shipment.
+    </p>
+
+    <p>
+      <a href="http://localhost:3000/orders">
+        View your order and rate your purchase
+      </a>
+    </p>
+
+    <p>
+      Thank you for your purchase from Super E-commerce!
+    </p>
+
+    <p>
+      Best regards,<br>
+      Super E-commerce Team
+    </p>`,
     });
 
     await finalizeOrderAsPaid(order.id);
@@ -416,5 +453,3 @@ export async function confirmCheckoutService(userId: string, orderId: string) {
 
   return { ...order, status: intent.status as 'PENDING' };
 }
-
-

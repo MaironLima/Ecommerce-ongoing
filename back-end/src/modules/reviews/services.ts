@@ -15,7 +15,6 @@ export async function reviewGetAllService() {
       comment: true,
       moderated: true,
       created_at: true,
-
       id_sync: {
         select: {
           id: true,
@@ -91,6 +90,24 @@ export async function reviewPostService(
   });
 
   return review;
+}
+
+export async function reviewValidationService(reviewId: string) {
+  const review = await prisma.review.findUnique({ where: { id: reviewId } });
+  if (!review) {
+    throw new Error('Review not founded');
+  }
+  
+  await prisma.review.update({
+    where: {
+      id: review.id,
+    },
+    data: {
+      moderated: true,
+    },
+  });
+  
+  return;
 }
 
 export async function reviewDeleteService(reviewId: string) {

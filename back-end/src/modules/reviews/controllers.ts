@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { reviewDeleteService, reviewGetAllService, reviewGetService, reviewPostService,  } from './services';
+import { reviewDeleteService, reviewGetAllService, reviewGetService, reviewPostService, reviewValidationService,  } from './services';
 import { reviewSchema } from './dto';
 
 export const reviewGetAllController = async (_req: Request, res: Response) => {
@@ -77,6 +77,26 @@ export const reviewPostController = async (req: Request, res: Response) => {
   } catch (e: any) {
     return res.status(500).json({
       error: e.message || 'Error creating review',
+    });
+  }
+};
+
+export const reviewValidationController = async (req: Request, res: Response) => {
+  try {
+    const reviewId = req.params.reviewId;
+
+    if (!reviewId) {
+      return res.status(400).json({
+        error: 'The review ID has not been identified',
+      });
+    }
+
+    reviewValidationService(reviewId);
+
+    return res.status(200).send()
+  } catch (e: any) {
+    return res.status(500).json({
+      error: e.message || 'Error listing reviews',
     });
   }
 };
