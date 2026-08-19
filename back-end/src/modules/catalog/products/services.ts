@@ -4,7 +4,7 @@ import { prisma } from '../../../libs/prisma';
 export type SortOption = 'most recent' | 'ascending price' | 'descending price';
 
 export async function productsService(
-  sort: string = 'most recent', 
+  sort: string = 'most recent',
   limit = 20,
   offset = 0,
   category: string = 'all',
@@ -13,13 +13,13 @@ export async function productsService(
   const formatedCategory = category.toLowerCase().trim();
 
   let orderBy: string;
-  
+
   if (formatedSort === 'ascending price') {
     orderBy = 'p.base_price ASC';
   } else if (formatedSort === 'descending price') {
     orderBy = 'p.base_price DESC';
   } else {
-    orderBy = 'p.created_at DESC'; 
+    orderBy = 'p.created_at DESC';
   }
 
   let sql: string;
@@ -37,10 +37,9 @@ export async function productsService(
       ORDER BY ${orderBy}
       LIMIT $1 OFFSET $2;
     `;
-    
+
     const { rows } = await pool.query(sql, [limit, offset]);
     return { rows };
-
   } else {
     sql = `
       SELECT
@@ -122,6 +121,24 @@ export async function productsGetService(id: string) {
     include: {
       extra_imagens: true,
       product_category: { include: { category_sync: { select: { name: true } } } },
+      review: {
+        where: {
+          moderated: true,
+        },
+        select: {
+          id: true,
+          rating: true,
+          title: true,
+          comment: true,
+          created_at: true,
+
+          id_sync: {
+            select: {
+              name: true
+            }
+          }
+        },
+      },
     },
   });
 
@@ -269,7 +286,7 @@ export async function productsDeleteService(id: string) {
 export async function productsDeleteAllService() {
   try {
     const products = await prisma.product.findMany({ select: { id: true } });
-    
+
     for (const product of products) {
       await productsDeleteService(product.id);
     }
